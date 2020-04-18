@@ -1,5 +1,11 @@
 --Game State
-gs = {}
+gs = {
+  player = {sprite=2,w=8,h=8},
+  customs = {sprite=7,text='customs',w=8,h=8},
+  trader = {sprite=8,text='trader',w=8,h=8},
+  fueler = {sprite=10,text='fueler',w=8,h=8},
+  a_prompt = {sprite=9,w=8,h=8},
+}
 ticker = 0
 win_amount = 100 --k$
 lose_amount = 0

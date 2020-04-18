@@ -8,6 +8,11 @@ function dsto(a,b)
   return sqrt(dx*dx + dy*dy)
 end
 
+function rects_intersect(a,b)
+  --Note: Both a and b must have x,y,w,h
+  return not (a.x+a.w<b.x or b.x+b.w<a.x or a.y+a.h<b.y or b.y+b.h<a.y)
+end
+
 function scene()
   local slf = {
     _interfaces = {},
@@ -66,16 +71,17 @@ function splat(tag,o)
   for k,v in pairs({
     tag=tag, ref='',
     x=0,y=0,w=0,h=0,a_x=0,a_y=0, --box
-    c_f=-1,c_b=-1,c_fa=nil,c_ba=14, --colors
+    c_f=8,c_b=8,c_fa=nil,c_ba=14, --colors
     sprite=-1,as_x=0,as_y=0,at_x=0,at_y=0,s_w=1,s_h=1,s_f=false, --sprite
     text='',t_center=false,c_t=7, --text
     active=false,selectable=false,
     down=nil,up=nil,left=nil,right=nil,
     update=function(me)
       if(gs[me.ref]) then
-        me.sprite = gs[me.ref].sprite
-        me.x = gs[me.ref].x
-        me.y = gs[me.ref].y
+        me.text = gs[me.ref].text or me.text
+        me.sprite = gs[me.ref].sprite or me.sprite
+        me.x = gs[me.ref].x or me.x
+        me.y = gs[me.ref].y or me.y
       end
     end,
     execute=function(me)printh("Executing tag "..me.tag)end
