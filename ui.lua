@@ -13,7 +13,11 @@ function scene()
     del(me._interfaces, me:interface())
   end
   slf.draw = function(me)
-    map(0,0,0,0,6,8)
+    rectfill(0,0,127,127,0)
+    palt(0,false)
+    palt(14,true)
+    map(0,0,0,0,20,20)
+    palt()
     for k in all(me._interfaces) do
       me[k]:draw()
     end
@@ -101,11 +105,11 @@ function start_scene()
     end
   end
   -- Player wandering a map, able to bump into walls and interact with Things
-  gs['player'] = {x=9,y=9}
+  gs['player'] = {x=9,y=25}
   result.wandering = interface()
   result.wandering._current_splat='player'
   result.wandering._splats = {
-    ['player']= splat('player',{ref='player',w=8,h=8,sprite=0,active=true})
+    ['player']= splat('player',{ref='player',w=8,h=8,sprite=5,active=true})
   }
   result.wandering.update = function(me)
     local x = gs['player'].x
