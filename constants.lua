@@ -1,24 +1,22 @@
+get_xy = true
 --Game State
 gs = {
   player = {sprite=2,w=8,h=8},
   customs = {sprite=7,text='customs',w=8,h=8},
   trader = {sprite=8,text='trader',w=8,h=8},
   fueler = {sprite=10,text='fueler',w=8,h=8},
+  armsdealer = {sprite=11,text='armsdealer',w=8,h=8},
   a_prompt = {sprite=9,w=8,h=8},
 }
 ticker = 0
 win_amount = 100 --k$
 lose_amount = 0
-trade_good_keys = {"medicine","fuel","food","steel","weapons","robotics","tools","artwork"}
-trade_goods = {
-  medicine = {sprite_id = 10, base_price = 10, bulk = 1},
-  fuel = {sprite_id = 6, base_price = 5, bulk = 3},
-  food = {sprite_id = 3, base_price = 4, bulk = 3},
-  steel = {sprite_id = 5, base_price = 6, bulk = 2},
-  weapons = {sprite_id = 9, base_price = 10, bulk = 2},
-  robotics = {sprite_id = 7, base_price = 8, bulk = 2},
-  tools = {sprite_id = 8, base_price = 10, bulk = 2},
-  artwork = {sprite_id = 2, base_price = 20, bulk = 2},
+trade_goods = {'medicine','parcels','machinery','electronics'}
+trade_good_info = {
+  medicine = {sprite_id = 64, base_price = 10, bulk = 1},
+  parcels = {sprite_id = 65, base_price = 20, bulk = 2},
+  machinery = {sprite_id = 66, base_price = 30, bulk = 3},
+  electronics = {sprite_id = 67, base_price = 40, bulk = 4},
 }
 neg_ln = {
 [1]= 0,
