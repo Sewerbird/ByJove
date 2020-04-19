@@ -32,6 +32,70 @@ function reevaluate_price(trader, trade_good)
   gs[trader].business[trade_good].sell_price = today_sell
 end
 
+function run_trader_update(trader)
+  for trade_good in all(trade_goods) do
+    if gs[trader].business[trade_good] ~= nil then
+      local event = rnd()
+      if event > 0.95 then --glut
+        gs[trader].business[trade_good].stock = max(gs[trader].business[trade_good].stock or 256)
+      elseif event > 0.90 then --drought
+        gs[trader].business[trade_good].stock = min(gs[trader].business[trade_good].stock or 0)
+      elseif event > 0.85 then --stabilize
+        gs[trader].business[trade_good].stock = max(gs[trader].business[trade_good].stock or 128)
+      else
+        gs[trader].business[trade_good].stock += (rnd()*128)-64
+        gs[trader].business[trade_good].stock = clamp(flr(gs[trader].business[trade_good].stock),0,512)
+      end
+    end
+  end
+end
+
+function check_end_conditions()
+  local end_condition = nil
+  --if player can't afford to get into a station
+  if gs.player.business.balance < customs_amount then
+    --and player is locked out
+    if gs.customs.is_blocking then
+      printh("Player has lost via lockout")
+      end_condition = "Refugee"
+      gs.bankruptcy_scene = bankruptcy_scene()
+      gs.cs = "bankruptcy_scene"
+    end
+  elseif gs.player.business.balance > win_amount then
+    printh("Player has won via cash")
+    end_condition = "Victory"
+    gs.victory_scene = victory_scene()
+    gs.cs = "victory_scene"
+  end
+  return end_condition
+end
+
+function calculate_fuel_need(start,finish)
+  return planets[start].fuel_cost[finish]
+end
+
+function load_station(destination)
+  gs.cs = 'starport'
+  --Load up station-specific attributes for the station actors
+  local s = gs['station_'..destination]
+  for key, spec in pairs(s.actors) do
+    if gs[key] then
+      gs[key].x = spec.x
+      gs[key].y = spec.y
+      gs[key].is_blocking = spec.is_blocking
+      if spec.business then
+        gs[key].business = spec.business
+      end
+      if gs[key].business ~= nil and gs[key].business.volatile and key ~= 'player' then
+        run_trader_update(key)
+      end
+    end
+  end
+  --Load the station
+  gs.starport = starport_scene('station_'..destination)
+end
+
+
 -- UI Support
 function scene()
   local slf = {
@@ -81,6 +145,7 @@ function interface()
     end
   end
   slf.update = function(me)
+    camera(0,0)
     local dir = nil
     if btnp(0) then dir = 'left' end
     if btnp(1) then dir = 'right' end
@@ -111,7 +176,7 @@ function splat(tag,o)
     c_f=0,c_b=0,c_fa=nil,c_ba=14, --colors
     sprite=-1,as_x=0,as_y=0,at_x=0,at_y=0,s_w=1,s_h=1,s_f=false, --sprite
     text='',t_center=false,c_t=7, --text
-    active=false,selectable=false,
+    active=false,selectable=false,s_circle=false,r=0,
     down=nil,up=nil,left=nil,right=nil,
     update=function(me)
       if(gs[me.ref]) then
@@ -144,7 +209,15 @@ function splat(tag,o)
       end
     end
     if me.c_t>0 then print(me.text,txt_x+me.at_x,txt_y+me.at_y,me.c_t) end
-    if c_b>0 then rect(l_x,t_y,r_x,b_y,me.active and me.c_ba or me.c_b) end
+    if me.active and me.s_circle then
+      circ(l_x+me.w/2-1,t_y+me.w/2-1,me.r,me.c_ba) 
+    end
+    if not me.s_circle and not me.active and me.c_b > 0 then 
+      rect(l_x,t_y,r_x,b_y,me.active and me.c_ba or me.c_b) 
+    end
+    if not me.s_circle and me.active and me.c_ba > 0 then 
+      rect(l_x,t_y,r_x,b_y,me.active and me.c_ba or me.c_b) 
+    end
   end
   return me
 end
