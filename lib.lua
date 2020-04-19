@@ -8,10 +8,16 @@ function dsto(a,b)
   return sqrt(dx*dx + dy*dy)
 end
 
+function clamp(x,a,b)
+  return min(max(x,a),b)
+end
+
 function rects_intersect(a,b)
   --Note: Both a and b must have x,y,w,h
   return not (a.x+a.w<b.x or b.x+b.w<a.x or a.y+a.h<b.y or b.y+b.h<a.y)
 end
+
+-- Gamestate Support
 
 function reevaluate_price(trader, trade_good)
   local in_stock = gs[trader].business[trade_good].stock
@@ -26,6 +32,7 @@ function reevaluate_price(trader, trade_good)
   gs[trader].business[trade_good].sell_price = today_sell
 end
 
+-- UI Support
 function scene()
   local slf = {
     _interfaces = {},
@@ -36,9 +43,12 @@ function scene()
   slf.push_interface = function(me, interface_tag)
     add(me._interfaces, interface_tag)
   end
-  slf.pop_interface = function(me)
-    if(#me._interfaces == 1) then return end
-    del(me._interfaces, me:interface())
+  slf.pop_interface = function(me,depth)
+    depth = depth or 1
+    for i =1,depth do
+      if(#me._interfaces == 1) then return end
+      del(me._interfaces, me._interfaces[#me._interfaces])
+    end
   end
   slf.draw = function(me)
     for k in all(me._interfaces) do
@@ -46,12 +56,9 @@ function scene()
     end
   end
   slf.update = function(me)
-    if btnp(4) then me:pop_interface() end
-    if btnp(5) then me[me:interface()]:execute() end
     me[me:interface()]:update()
   end
   slf.execute = function(me)
-    print("Scene executing")
     me[me:interface()]:execute()
   end
   return slf
@@ -68,7 +75,7 @@ function interface()
     return me._splats[me._current_splat]
   end
   slf.draw = function(me)
-    if me._splat != nil then me._splat:draw() end
+    if me._splat ~= nil then me._splat:draw() end
     for _,splat in pairs(me._splats) do
       splat:draw()
     end
@@ -79,18 +86,18 @@ function interface()
     if btnp(1) then dir = 'right' end
     if btnp(2) then dir = 'up' end
     if btnp(3) then dir = 'down' end
-    local current_splat = me:current_splat()
-    if dir and me._current_splat and me._splats[me._current_splat][dir] then
-      me:current_splat().active = false
-      me._current_splat = current_splat[dir]
-      me:current_splat().active = true
+    if dir and me._current_splat and me._splats[me._current_splat][dir] != nil then
+      me._splats[me._current_splat].active = false
+      me._current_splat = me._splats[me._current_splat][dir]
+      me._splats[me._current_splat].active = true
     end
+    if btnp(4) then gs[gs.cs]:pop_interface() end
+    if btnp(5) then me:execute() end
     for _,splat in pairs(me._splats) do
       splat:update()
     end
   end
   slf.execute = function(me)
-    printh("Interface executing")
     me._splats[me._current_splat]:execute()
   end
   return slf
@@ -117,11 +124,16 @@ function splat(tag,o)
     execute=function(me)printh("Executing tag "..me.tag)end
   }) do me[k] = o[k] or v end
   me.draw=function(me)
+    if me.hidden then
+      return
+    end
     local c_f = me.active and me.c_fa or me.c_f
     local c_b = me.active and me.c_ba or me.c_b
     local l_x,t_y=me.x-me.a_x,me.y-me.a_y
     local r_x,b_y=l_x+me.w,t_y+me.h
-    local txt_x=me.t_center and (l_x+(me.w/2)-#me.text*2) or l_x
+    local t_lines=me.t_lines
+    if t_lines == nil then t_lines = 1 end
+    local txt_x=me.t_center and (l_x+(me.w/2)-#(me.text)/(t_lines)*2) or l_x
     local txt_y=me.t_center and (t_y+flr(me.h/2)-2) or t_y
     if c_f>0 then rectfill(l_x,t_y,r_x,b_y,me.active and me.c_fa or me.c_f) end
     if me.sprite then
