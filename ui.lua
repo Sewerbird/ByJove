@@ -23,6 +23,7 @@ function travel_dialog(here,destination)
     ok_button = splat('ok_button',{
       right = 'cancel_button', x=c_x-32,y=t_y+h,w=30,h=10,text="okay",c_b=13,c_f=1,active=has_the_fuel,hidden=not has_the_fuel,t_center=true,
       execute = function() 
+        sfx(38)
         gs[gs.cs]:pop_interface(2) --pop dialog and map interface
         --TODO go to ship scene instead
         gs['player'].business.fuel_tank_used -= fuel_need
@@ -32,6 +33,7 @@ function travel_dialog(here,destination)
     cancel_button = splat('cancel_button',{
       left = 'ok_button', x=c_x+2,y=t_y+h,w=30,h=10,text="cancel",c_b=13,c_f=1,t_center=true,active=not has_the_fuel,
       execute = function() 
+        sfx(37)
         gs[gs.cs]:pop_interface() 
       end
     })
@@ -67,8 +69,10 @@ function travelling_interface(active_splat)
   ask_travel = function(tgt)
     return function()
       if tgt == gs[gs[gs.cs].current_station].planet then
+        sfx(37)
         gs[gs.cs]:pop_interface()
       else
+        sfx(38)
         gs[gs.cs].destination_planet = tgt
         gs[gs.cs].travel_dialog = travel_dialog(gs[current_station].planet,tgt)
         gs[gs.cs]:push_interface('travel_dialog')
@@ -117,6 +121,7 @@ function trading_interface(trader_tag,active_splat)
   slf._current_splat=active_splat or 'buy_'..my_trade_goods[1]
   slf.update = function(me)
     if btnp(4) then
+      sfx(37)
       gs[gs.cs]:pop_interface()
     end
     local dir = nil
@@ -176,6 +181,7 @@ function trading_interface(trader_tag,active_splat)
           gs[trader_tag].business[good].stock += amount
           reevaluate_price(trader_tag,good)
           gs[gs.cs].trading = trading_interface(trader_tag,slf._current_splat)
+          sfx(33)
         elseif good ~= 'fuel' and gs['player'].business[good].stock >= amount then
           gs['player'].business[good].stock -= amount
           gs['player'].business.cargo_free += amount*trade_good_info[good].bulk
@@ -184,8 +190,9 @@ function trading_interface(trader_tag,active_splat)
           gs[trader_tag].business[good].stock += amount
           reevaluate_price(trader_tag,good)
           gs[gs.cs].trading = trading_interface(trader_tag,slf._current_splat)
+          sfx(33)
         else
-          --TODO bzzt
+          sfx(32)
           printh("Not enough stock")
         end
       end
@@ -208,6 +215,7 @@ function trading_interface(trader_tag,active_splat)
           gs[trader_tag].business[good].stock -= amount
           reevaluate_price(trader_tag,good)
           gs[gs.cs].trading = trading_interface(trader_tag,slf._current_splat)
+          sfx(34)
         elseif good ~= 'fuel' 
           and gs['player'].business.balance > gs[trader_tag].business[good].sell_price * amount / 1000
           and gs['player'].business.cargo_free >= trade_good_info[good].bulk * amount
@@ -219,8 +227,9 @@ function trading_interface(trader_tag,active_splat)
           gs[trader_tag].business[good].stock -= amount
           reevaluate_price(trader_tag,good)
           gs[gs.cs].trading = trading_interface(trader_tag,slf._current_splat)
+          sfx(34)
         else
-          --TODO bzzt
+          sfx(32)
           printh("Not enough stock, space, and/or money")
         end
       end})
@@ -271,6 +280,7 @@ function talk_interface()
   end
   slf.update = function(me)
     if btnp(4) then
+      sfx(37)
       gs[gs.cs]:pop_interface()
     end
     local dir = nil
@@ -290,6 +300,9 @@ function talk_interface()
         gs['player'].business.balance -= customs_amount
         gs['customs'].is_blocking = false
         gs[gs.cs].talking = talk_interface()
+        sfx(38)
+      else
+        sfx(37)
       end
       gs[gs.cs]:pop_interface()
     end
@@ -297,7 +310,7 @@ function talk_interface()
   return slf
 end
 
-function wandering_interface()
+function wandering_interface(moffx,moffy)
   local slf = interface()
   slf._current_splat='player'
   --TODO the list of actors really needs to come from somewhere else...
@@ -314,8 +327,8 @@ function wandering_interface()
   }
   slf.update = function(me)
     --Handle Motion
-    local x = gs['player'].x
-    local y = gs['player'].y
+    local x = gs['player'].x + moffx
+    local y = gs['player'].y + moffy
     local dx = 0
     local dy = 0
     if btn(0) then dx -= 1 end
@@ -325,8 +338,8 @@ function wandering_interface()
     --Check collision with actors
     local bumped = false
     local player = {
-      x = gs['player'].x + dx,
-      y = gs['player'].y + dy,
+      x = gs['player'].x + moffx + dx,
+      y = gs['player'].y + moffy + dy,
       w = gs['player'].w,
       h = gs['player'].h,
     }
@@ -344,7 +357,17 @@ function wandering_interface()
       not fget(mget((x+dx)/8, y/8),0) and
       not fget(mget((x+dx+7)/8, (y+7)/8),0) and
       not fget(mget((x+dx)/8, (y+7)/8),0) then
+      if dx > 0 or dx < 0 then 
+        if not gs['player'].is_walking then
+          gs['player'].is_walking = true
+          sfx(36,60) 
+        end
+      end
       gs['player'].x += dx
+    end
+    if dx == 0 and gs['player'].is_walking then
+      gs['player'].is_walking = false
+      sfx(-1,60) 
     end
     x = gs['player'].x
     if 
@@ -373,20 +396,26 @@ function wandering_interface()
     end
     --Handle pressing 'A' to activate an NPC
     if me.target_npc and btnp(5) then
+      sfx(-1,1) 
+      sfx(35)
       if me.target_npc == "customs" then
         gs[gs.cs].talking = talk_interface(slf._current_splat)
+        sfx(38)
         gs[gs.cs]:push_interface('talking')
       end
       if me.target_npc == "trader" then
         gs[gs.cs].trading = trading_interface(me.target_npc)
+        sfx(38)
         gs[gs.cs]:push_interface('trading')
       end
       if me.target_npc == "fueler" then
         gs[gs.cs].trading = trading_interface(me.target_npc)
+        sfx(38)
         gs[gs.cs]:push_interface('trading')
       end
       if me.target_npc == "travel_console" then
         gs[gs.cs].travelling = travelling_interface(slf._current_splat)
+        sfx(38)
         gs[gs.cs]:push_interface('travelling')
       end
     end
@@ -419,11 +448,18 @@ function starport_scene(station_tag)
   end
   slf.update = function(me)
     ticker+=1
+    music_ticker += 1
+    if music_ticker > 5000 then
+      music(0,300)
+      music_ticker = 0
+    elseif music_ticker == 1150 then
+      music(8)
+    end
     camera(clamp(min(gs['player'].x-64,s.mx1*8-127),s.mx0*8,s.mx1*8),clamp(gs['player'].y-64),s.my0*8,s.my1*8)
     me[me:interface()]:update()
   end
   -- Player wandering a map, able to bump into walls and interact with Things
-  slf.wandering = wandering_interface()
+  slf.wandering = wandering_interface(s.mx0*8,s.my0*8)
   slf:push_interface("wandering")
 
   return slf
@@ -462,6 +498,7 @@ function bankruptcy_scene()
   local slf = scene()
   gs.ticker = 0
   slf.losing = bankruptcy_interface()
+  sfx(37)
   slf:push_interface("losing")
   return slf
 end
@@ -500,6 +537,7 @@ function victory_scene()
   local slf = scene()
   gs.ticker = 0
   slf.winning = victory_interface()
+  sfx(38)
   slf:push_interface("winning")
   return slf
 end
@@ -576,6 +614,7 @@ function tutorial_scene()
     end
   end
   slf.teaching = tutorial_interface()
+  sfx(38)
   slf:push_interface("teaching")
   return slf
 end
@@ -612,7 +651,6 @@ function start_scene()
     end
   end
   slf.update = function(me)
-    if btnp(4) then me:pop_interface() end
     if btnp(5) then me[me:interface()]:execute() end
     for k in all(me._interfaces) do
       me[k]:update()

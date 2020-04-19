@@ -1,4 +1,4 @@
-get_xy = false
+get_xy = true
 skip_tutorial = false
 --Game State
 gs = {
@@ -91,21 +91,22 @@ gs = {
     },
   },
   station_callisto = {
-    mx0=0,my0=0,mx1=32,my1=16,
+    mx0=0,my0=16,mx1=32,my1=32,
     planet="callisto",
     actors={
-      player = {x=52,y=104},
-      travel = {x=80,y=104},
-      customs = {x=32,y=64,is_blocking=true},
-      trader = {x=20,y=24},
-      fueler = {x=40,y=104},
-      armsdealer = {x=160,y=40},
+      player = {x=104,y=88},
+      travel = {x=120,y=108},
+      customs = {x=86,y=48,is_blocking=true},
+      trader = {x=144,y=32},
+      fueler = {x=80,y=88},
+      armsdealer = {x=-100,y=-100},
       a_prompt = {x=-100,y=-100},
-      travel_console = {x=80,y=104},
+      travel_console = {x=120,y=88},
     },
   }
 }
 ticker = 0
+music_ticker = 10000
 win_amount = 1000 --k$
 customs_amount = 0.1 --k$
 lose_amount = 100
