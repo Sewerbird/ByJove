@@ -45,8 +45,8 @@ function travelling_interface(active_splat)
   local slf = interface()
   local w = 127
   local h = 127
-  local l_x = 0
-  local t_y = 0
+  local l_x = 0+uix
+  local t_y = 0+uiy
   local c_x = 64 -8
   local scene = gs.cs
   local current_station = gs[scene].current_station
@@ -140,36 +140,36 @@ function trading_interface(trader_tag,active_splat)
     end
   end
   slf._splats = {}
-  slf._splat = splat('trading_interface',{x=l_x-2,y=t_y,w=w,h=h,c_f=1,c_b=13})
+  slf._splat = splat('trading_interface',{x=uix+l_x-2,y=uiy+t_y,w=w,h=h,c_f=1,c_b=13})
   local i = 1
   slf._splats['nameplate'] = splat('nameplate', {
-    x=l_x,y=t_y-10,w=40,h=9,t_center=true,text="Trade",c_b=13,c_f=1,c_t=11
+    x=uix+l_x,y=uiy+t_y-10,w=40,h=9,t_center=true,text="Trade",c_b=13,c_f=1,c_t=11
   })
   slf._splats['them_header'] = splat('them_header',{
-    x=l_x,y=t_y,w=20,h=9,text="them",t_center=true,c_t=9
+    x=uix+l_x,y=uiy+t_y,w=20,h=9,text="them",t_center=true,c_t=9
   })
   slf._splats['sell_header'] = splat('sell_header',{
-    x=l_x+20,y=t_y,w=20,h=9,text="sell",t_center=true,c_t=11
+    x=uix+l_x+20,y=uiy+t_y,w=20,h=9,text="sell",t_center=true,c_t=11
   })
   slf._splats['buy_header'] = splat('buy_header',{
-    x=l_x+50,y=t_y,w=20,h=9,text="buy",t_center=true,c_t=8
+    x=uix+l_x+50,y=uiy+t_y,w=20,h=9,text="buy",t_center=true,c_t=8
   })
   slf._splats['ship_header'] = splat('ship_header',{
-    x=l_x+70,y=t_y,w=20,h=9,text="ship",t_center=true,c_t=9
+    x=uix+l_x+70,y=uiy+t_y,w=20,h=9,text="ship",t_center=true,c_t=9
   })
   slf._splats['wallet_balance'] = splat('wallet_balance', {
-    x=c_x,y=t_y+h,w=40,h=9,t_center=true,text="$"..flr(player_business.balance*1000),c_b=13,c_f=1,c_t=11
+    x=uix+c_x,y=uiy+t_y+h,w=40,h=9,t_center=true,text="$"..flr(player_business.balance*1000),c_b=13,c_f=1,c_t=11
   })
   slf._splats['tonnage_balance'] = splat('tonnage_balance', {
-    x=c_x,y=t_y+h+10,w=40,h=9,t_center=true,text=""..player_business.cargo_used.."/"..player_business.cargo_space.."t",c_b=13,c_f=1,c_t=11
+    x=uix+c_x,y=uiy+t_y+h+10,w=40,h=9,t_center=true,text=""..player_business.cargo_used.."/"..player_business.cargo_space.."t",c_b=13,c_f=1,c_t=11
   })
   for good in all(my_trade_goods) do
     reevaluate_price(trader_tag,good)
     slf._splats['them_'..good] = splat('them_'..good,
-    {x=l_x,y=t_y+i*10,w=20,h=9,text=""..trader_business[good].stock,t_center=true
+    {x=uix+l_x,y=uiy+t_y+i*10,w=20,h=9,text=""..trader_business[good].stock,t_center=true
     })
     slf._splats['sell_'..good] = splat('sell_'..good,
-      {x=l_x+20,y=t_y+i*10,w=20,h=9,c_ba=7,
+      {x=uix+l_x+20,y=uiy+t_y+i*10,w=20,h=9,c_ba=7,
       text="$"..flr(trader_business[good].buy_price),t_center=true,active=("sell_"..good)==slf._current_splat,
       execute=function(me)
         local amount = btn(0) and 5 or 1
@@ -198,10 +198,10 @@ function trading_interface(trader_tag,active_splat)
       end
       })
     slf._splats['tag_'..good] = splat('tag_'..good,
-    {x=l_x+40,y=t_y+i*10,w=10,h=9,sprite=trade_good_info[good].sprite_id
+    {x=uix+l_x+40,y=uiy+t_y+i*10,w=10,h=9,sprite=trade_good_info[good].sprite_id
     })
     slf._splats['buy_'..good] = splat('buy_'..good,
-      {x=l_x+50,y=t_y+i*10,w=20,h=9,c_ba=7,
+      {x=uix+l_x+50,y=uiy+t_y+i*10,w=20,h=9,c_ba=7,
       text="$"..flr(trader_business[good].sell_price),t_center=true,active=("buy_"..good)==slf._current_splat,
       execute=function(me)
         local amount = btn(1) and 5 or 1
@@ -234,7 +234,7 @@ function trading_interface(trader_tag,active_splat)
         end
       end})
     slf._splats['amt_'..good] = splat('amt_'..good,
-    {x=l_x+70,y=t_y+i*10,w=20,h=9,text=good=='fuel' and ""..gs['player'].business.fuel_tank_used or ""..player_business[good].stock,t_center=true
+    {x=uix+l_x+70,y=uiy+t_y+i*10,w=20,h=9,text=good=='fuel' and ""..gs['player'].business.fuel_tank_used or ""..player_business[good].stock,t_center=true
     })
     slf._splats['buy_'..good].left='sell_'..my_trade_goods[i] 
     slf._splats['sell_'..good].right='buy_'..my_trade_goods[i] 
@@ -267,10 +267,10 @@ function talk_interface()
     prompt = "yOU ARE FREE \nTO PASS.\n\ncARRY ON,\nCITIZEN"
   end
   slf._splats = {
-    ['text_area']=splat('text_area',{text=prompt,at_x=2,at_y=2,x=30,y=30,w=64,h=64,c_f=1,c_b=13}),
-    ['pay_customs']= splat('pay_customs',{x=62,y=30+64-11,a_x=20,w=40,h=9,c_f=1,c_b=13,text="ok",t_center=true,active=true}),
+    ['text_area']=splat('text_area',{text=prompt,at_x=2,at_y=2,x=30+uix,y=30+uiy,w=64,h=64,c_f=1,c_b=13}),
+    ['pay_customs']= splat('pay_customs',{x=62+uix,y=uiy+30+64-11+uix,a_x=20,w=40,h=9,c_f=1,c_b=13,text="ok",t_center=true,active=true}),
     ['wallet'] = splat('wallet_balance', {
-      x=64,y=94,w=20,h=9,t_center=true,text="$"..(player_business.balance*1000),c_b=13,c_f=1,c_t=11
+      x=64+uix,y=94+uiy,w=20,h=9,t_center=true,text="$"..(player_business.balance*1000),c_b=13,c_f=1,c_t=11
     })
   }
   slf.draw = function(me)
@@ -310,7 +310,7 @@ function talk_interface()
   return slf
 end
 
-function wandering_interface(moffx,moffy)
+function wandering_interface()
   local slf = interface()
   slf._current_splat='player'
   --TODO the list of actors really needs to come from somewhere else...
@@ -327,8 +327,8 @@ function wandering_interface(moffx,moffy)
   }
   slf.update = function(me)
     --Handle Motion
-    local x = gs['player'].x + moffx
-    local y = gs['player'].y + moffy
+    local x = gs['player'].x
+    local y = gs['player'].y
     local dx = 0
     local dy = 0
     if btn(0) then dx -= 1 end
@@ -338,8 +338,8 @@ function wandering_interface(moffx,moffy)
     --Check collision with actors
     local bumped = false
     local player = {
-      x = gs['player'].x + moffx + dx,
-      y = gs['player'].y + moffy + dy,
+      x = gs['player'].x + dx,
+      y = gs['player'].y + dy,
       w = gs['player'].w,
       h = gs['player'].h,
     }
@@ -351,31 +351,33 @@ function wandering_interface(moffx,moffy)
       end
     end
     --Check collision with map
-    if 
-      not bumped and
-      not fget(mget((x+dx+7)/8, y/8),0) and
-      not fget(mget((x+dx)/8, y/8),0) and
-      not fget(mget((x+dx+7)/8, (y+7)/8),0) and
-      not fget(mget((x+dx)/8, (y+7)/8),0) then
-      if dx > 0 or dx < 0 then 
-        if not gs['player'].is_walking then
-          gs['player'].is_walking = true
-          sfx(36,60) 
-        end
-      end
+    my_mx = x/8+moffx
+    my_dmx = (4*sgn(dx)+4)/8
+    my_my = y/8+moffy-1/8
+    my_dmy = (4*sgn(dy)+4)/8
+    my_tx1 = my_mx + my_dmx
+    my_ty1 = my_my+0.5
+    my_tx2 = my_mx + 0.5
+    my_ty2 = my_my+my_dmy
+    printh("==========")
+    printh("I think I am at mget = ("..my_mx..","..my_my..")")
+    printh("==========")
+    if not bumped and not fget(mget(my_tx1,my_ty1),0) then
       gs['player'].x += dx
+    end
+    if not bumped and not fget(mget(my_tx2,my_ty2),0) then
+      gs['player'].y += dy
+    end
+    --Check walking sound
+    if dx > 0 or dx < 0 then 
+      if not gs['player'].is_walking then
+        gs['player'].is_walking = true
+        sfx(36,60) 
+      end
     end
     if dx == 0 and gs['player'].is_walking then
       gs['player'].is_walking = false
       sfx(-1,60) 
-    end
-    x = gs['player'].x
-    if 
-      not fget(mget(x/8, (y+dy+7)/8),0) and
-      not fget(mget(x/8, (y+dy)/8),0) and
-      not fget(mget((x+7)/8, (y+dy+7)/8),0) and
-      not fget(mget((x+7)/8, (y+dy)/8),0) then
-      gs['player'].y += dy
     end
     --Handle player being near an NPC
     local target_npc = nil
@@ -397,23 +399,28 @@ function wandering_interface(moffx,moffy)
     --Handle pressing 'A' to activate an NPC
     if me.target_npc and btnp(5) then
       sfx(-1,1) 
+      printh("Pressed a at "..me.target_npc)
       sfx(35)
       if me.target_npc == "customs" then
+        printh("talkig to customs")
         gs[gs.cs].talking = talk_interface(slf._current_splat)
         sfx(38)
         gs[gs.cs]:push_interface('talking')
       end
       if me.target_npc == "trader" then
+        printh("Talking to trader")
         gs[gs.cs].trading = trading_interface(me.target_npc)
         sfx(38)
         gs[gs.cs]:push_interface('trading')
       end
       if me.target_npc == "fueler" then
+        printh("Talking to fueler")
         gs[gs.cs].trading = trading_interface(me.target_npc)
         sfx(38)
         gs[gs.cs]:push_interface('trading')
       end
       if me.target_npc == "travel_console" then
+        printh("Tlaking to computer")
         gs[gs.cs].travelling = travelling_interface(slf._current_splat)
         sfx(38)
         gs[gs.cs]:push_interface('travelling')
@@ -435,8 +442,8 @@ function starport_scene(station_tag)
   -- Starport methods
   slf.draw = function(me)
     srand(0)
-    for i=0,300 do
-      circ(mod(ticker/10+rnd()*256,256),sin(ticker/5000)*10+rnd()*127,0,7)
+    for i=0,500 do
+      circ(mod(ticker/10+rnd()*256,256),sin(ticker/5000)*10+rnd()*256,0,7)
     end
     palt(0,false)
     palt(14,true)
@@ -445,21 +452,34 @@ function starport_scene(station_tag)
     for k in all(me._interfaces) do
       me[k]:draw()
     end
+    --TODO
+    if my_tx1 and my_ty1 then
+      circ(my_tx1*8,my_ty1*8,0,8)
+      circ(my_tx2*8,my_ty2*8,0,11)
+    end
   end
   slf.update = function(me)
     ticker+=1
     music_ticker += 1
     if music_ticker > 5000 then
-      music(0,300)
+      --music(0,300)
       music_ticker = 0
     elseif music_ticker == 1150 then
       music(8)
     end
-    camera(clamp(min(gs['player'].x-64,s.mx1*8-127),s.mx0*8,s.mx1*8),clamp(gs['player'].y-64),s.my0*8,s.my1*8)
+    uix = clamp(gs['player'].x-64,0,s.mx1*8-127)
+    uiy = clamp(gs['player'].y-64,0,s.my1*8-127)
+    camera( 
+      uix,
+      uiy
+      )
     me[me:interface()]:update()
   end
   -- Player wandering a map, able to bump into walls and interact with Things
-  slf.wandering = wandering_interface(s.mx0*8,s.my0*8)
+  slf.wandering = wandering_interface()
+  --TODO this is terrible
+  moffx = s.mx0
+  moffy = s.my0
   slf:push_interface("wandering")
 
   return slf

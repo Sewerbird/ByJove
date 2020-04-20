@@ -1,5 +1,5 @@
 get_xy = true
-skip_tutorial = false
+skip_tutorial = true
 --Game State
 gs = {
   ticker = 0,
@@ -10,8 +10,8 @@ gs = {
     business = {
       tax_rate = 0,
       balance = 1,
-      fuel_tank_space = 100,
-      fuel_tank_used = 100,
+      fuel_tank_space = 120,
+      fuel_tank_used = 120,
       fuel_tank_free = 0,
       cargo_space = 100,
       cargo_used = 0,
@@ -49,17 +49,16 @@ gs = {
   tutorial_player = { sprite=2,w=8,h=8,x=40,y=66 },
   a_prompt = {sprite=9,w=8,h=8,x=100,y=100},
   station_io = {
-    mx0=0,my0=0,mx1=32,my1=16,
+    mx0=0,my0=32,mx1=16,my1=32,
     planet="io",
     actors={
-      player = {x=52,y=104},
-      travel = {x=88,y=104},
-      customs = {x=40,y=64,is_blocking=true},
-      trader = {x=28,y=24},
-      fueler = {x=48,y=104},
-      armsdealer = {x=168,y=40},
+      player = {x=80,y=184},
+      travel = {x=72,y=184},
+      customs = {x=61,y=152,is_blocking=true},
+      trader = {x=96,y=120},
+      fueler = {x=96,y=184},
       a_prompt = {x=-100,y=-100},
-      travel_console = {x=80,y=104},
+      travel_console = {x=72,y=184},
     },
   },
   station_europa = {
@@ -91,7 +90,7 @@ gs = {
     },
   },
   station_callisto = {
-    mx0=0,my0=16,mx1=32,my1=32,
+    mx0=0,my0=16,mx1=32,my1=16,
     planet="callisto",
     actors={
       player = {x=104,y=88},
@@ -99,7 +98,6 @@ gs = {
       customs = {x=86,y=48,is_blocking=true},
       trader = {x=144,y=32},
       fueler = {x=80,y=88},
-      armsdealer = {x=-100,y=-100},
       a_prompt = {x=-100,y=-100},
       travel_console = {x=120,y=88},
     },

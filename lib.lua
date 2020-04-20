@@ -1,3 +1,7 @@
+function sgn(num)
+  return (num > 0 and 1 or (num < 0 and -1 or 0))
+end
+
 function mod(num,range)
   return num - flr(num/range)*range
 end
