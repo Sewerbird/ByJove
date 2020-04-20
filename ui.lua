@@ -55,8 +55,8 @@ function travelling_interface(active_splat)
   slf.draw = function(me)
     cls()
     srand(ticker)
-    for i=1,200 do
-      circ(rnd()*127,rnd()*127,0,5)
+    for v in all(stars) do
+      circ(v.x*127,v.y*127,0,5)
     end
     circfill(127,-64,128,15)
     circfill(120,-70,128,4)
@@ -443,8 +443,8 @@ function starport_scene(station_tag)
   -- Starport methods
   slf.draw = function(me)
     srand(ticker)
-    for i=0,500 do
-      circ(mod(ticker/10+rnd()*256,256),sin(ticker/5000)*10+rnd()*256,0,7)
+    for v in all(stars) do
+      circ(mod(ticker/10+v.x*127,256),sin(ticker/5000)*10+v.y*257,0,5)
     end
     palt(0,false)
     palt(14,true)
@@ -500,7 +500,7 @@ function bankruptcy_interface()
     line_7 = splat("line_7", {x=110,y=100,text="reset to try again",t_center=true})
   }
   slf.draw = function(me)
-    srand(ticker)
+    srand(0)
     for i=0,300 do
       circ(mod(rnd()*256,256),rnd()*127,0,5)
     end
@@ -539,7 +539,7 @@ function victory_interface()
     line_7 = splat("line_7", {x=100,y=100,text="congratuations!",t_center=true})
   }
   slf.draw = function(me)
-    srand(ticker)
+    srand(0)
     for i=0,300 do
       circ(mod(rnd()*256,256),rnd()*127,0,5)
     end
@@ -666,7 +666,7 @@ end
 function start_scene()
   local slf = scene()
   slf.draw = function(me)
-    srand(ticker)
+    srand(0)
     for i=0,300 do
       circ(mod(ticker/10+rnd()*256,256),sin(ticker/5000)*10+rnd()*127,0,7)
     end

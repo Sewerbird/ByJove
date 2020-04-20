@@ -148,6 +148,10 @@ planets = {
     }
   }
 }
+stars = {}
+for i=1,500 do
+  add(stars,{x= rnd(), y= rnd()})
+end
 neg_ln = {
 [1]= 0,
 [2]=-0.6931471806,
