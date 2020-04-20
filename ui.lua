@@ -27,6 +27,7 @@ function travel_dialog(here,destination)
         gs[gs.cs]:pop_interface(2) --pop dialog and map interface
         --TODO go to ship scene instead
         gs['player'].business.fuel_tank_used -= fuel_need
+        gs['player'].business.fuel_tank_free += fuel_need
         load_station(destination)
       end
     }),
@@ -53,7 +54,7 @@ function travelling_interface(active_splat)
   slf._current_splat='planet_'..gs[current_station].planet
   slf.draw = function(me)
     cls()
-    srand(0)
+    srand(ticker)
     for i=1,200 do
       circ(rnd()*127,rnd()*127,0,5)
     end
@@ -205,6 +206,7 @@ function trading_interface(trader_tag,active_splat)
       text="$"..flr(trader_business[good].sell_price),t_center=true,active=("buy_"..good)==slf._current_splat,
       execute=function(me)
         local amount = btn(1) and 5 or 1
+        printh("I can buy "..gs['player'].business.fuel_tank_free..' units of fuel')
         if good == 'fuel' 
           and gs['player'].business.balance > gs[trader_tag].business[good].sell_price * amount / 1000
           and gs['player'].business.fuel_tank_free >= trade_good_info[good].bulk * amount
@@ -440,7 +442,7 @@ function starport_scene(station_tag)
   slf.current_station = station_tag
   -- Starport methods
   slf.draw = function(me)
-    srand(0)
+    srand(ticker)
     for i=0,500 do
       circ(mod(ticker/10+rnd()*256,256),sin(ticker/5000)*10+rnd()*256,0,7)
     end
@@ -452,7 +454,7 @@ function starport_scene(station_tag)
       me[k]:draw()
     end
     --TODO
-    if my_tx1 and my_ty1 then
+    if debug_collision and my_tx1 and my_ty1 then
       circ(my_tx1*8,my_ty1*8,0,8)
       circ(my_tx2*8,my_ty2*8,0,11)
     end
@@ -498,7 +500,7 @@ function bankruptcy_interface()
     line_7 = splat("line_7", {x=110,y=100,text="reset to try again",t_center=true})
   }
   slf.draw = function(me)
-    srand(0)
+    srand(ticker)
     for i=0,300 do
       circ(mod(rnd()*256,256),rnd()*127,0,5)
     end
@@ -537,7 +539,7 @@ function victory_interface()
     line_7 = splat("line_7", {x=100,y=100,text="congratuations!",t_center=true})
   }
   slf.draw = function(me)
-    srand(0)
+    srand(ticker)
     for i=0,300 do
       circ(mod(rnd()*256,256),rnd()*127,0,5)
     end
@@ -570,6 +572,7 @@ function tutorial_interface()
     tutorial_player = splat('tutorial_player',{ref='tutorial_player',w=8,h=8,sprite=7}),
     tutorial_travel_console = splat('tutorial_travel_console',{ref='tutorial_travel_console',x=80,y=50,w=8,h=8,sprite=12}),
     act_btn = splat("act_btn", {x=64,y=80,sprite=9,as_x=16,hidden=true,text="When you see '   ', \npress x to interact",t_center=true,t_lines=2,h=8}),
+    goal_msg = splat("goal_msg", {x=64,y=80,text="Your goal is to\nmake $10,000 by\ntrading on the\nJovian moons.",t_center=true,t_lines=4,hidden=true}),
     exit_btn = splat("exit_btn", {x=64,y=80,text="To exit a dialog,\npress o at any time.\n\nDo so now to begin!",t_lines=3,t_center=true,hidden=true}),
     ['a_prompt']= splat('a_prompt',{ref='a_prompt',t_center=true,a_y=8,w=8,h=8}),
   }
@@ -601,6 +604,7 @@ function tutorial_interface()
       end
       if slf._splats.exit_btn.hidden then
         slf._splats.dpad.hidden = true
+        slf._splats.goal_msg.hidden = true
         slf._splats.act_btn.hidden = false
         if btnp(5) then
           slf._splats.dpad.hidden = true
@@ -608,12 +612,18 @@ function tutorial_interface()
           slf._splats.exit_btn.hidden = false
         end
       end
+    elseif dsto(player,gs['tutorial_travel_console']) < 40 then
+      slf._splats.dpad.hidden = true
+      slf._splats.act_btn.hidden = true
+      slf._splats.exit_btn.hidden = true
+      slf._splats.goal_msg.hidden = false
     else
       gs['a_prompt'].x = -100
       gs['a_prompt'].y = -100
       slf._splats.dpad.hidden = false
       slf._splats.exit_btn.hidden = true
       slf._splats.act_btn.hidden = true
+      slf._splats.goal_msg.hidden = true
     end
 
     --Update sub elements
@@ -627,7 +637,7 @@ end
 function tutorial_scene()
   local slf = scene()
   slf.draw = function(me)
-    map(0,32,32,42,8,4)
+    map(53,2,32,42,8,4)
     for k in all(me._interfaces) do
       me[k]:draw()
     end
@@ -656,7 +666,7 @@ end
 function start_scene()
   local slf = scene()
   slf.draw = function(me)
-    srand(0)
+    srand(ticker)
     for i=0,300 do
       circ(mod(ticker/10+rnd()*256,256),sin(ticker/5000)*10+rnd()*127,0,7)
     end

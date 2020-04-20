@@ -38,18 +38,8 @@ end
 
 function run_trader_update(trader)
   for trade_good in all(trade_goods) do
-    if gs[trader].business[trade_good] ~= nil then
-      local event = rnd()
-      if event > 0.95 then --glut
-        gs[trader].business[trade_good].stock = max(gs[trader].business[trade_good].stock or 256)
-      elseif event > 0.90 then --drought
-        gs[trader].business[trade_good].stock = min(gs[trader].business[trade_good].stock or 0)
-      elseif event > 0.85 then --stabilize
-        gs[trader].business[trade_good].stock = max(gs[trader].business[trade_good].stock or 128)
-      else
-        gs[trader].business[trade_good].stock += (rnd()*128)-64
-        gs[trader].business[trade_good].stock = clamp(flr(gs[trader].business[trade_good].stock),0,512)
-      end
+    if gs[trader].business[trade_good] then
+      gs[trader].business[trade_good].stock = flr(rnd()*(128))
     end
   end
 end

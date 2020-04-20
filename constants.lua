@@ -1,5 +1,6 @@
-get_xy = true
-skip_tutorial = true
+get_xy = false
+skip_tutorial = false
+debug_collision = false
 --Game State
 gs = {
   ticker = 0,
@@ -28,11 +29,11 @@ gs = {
     sprite=8,text='trader',w=8,h=8,x=20,y=24,
     business = {
       volatile = true,
-      tax_rate = 50,
-      medicine = {base_price = 10, desired_stock = 64, stock = 127, buy_price = 20, sell_price = 10},
-      parcels = {base_price = 10, desired_stock = 64, stock = 10, buy_price = 20, sell_price = 10},
-      machinery = {base_price = 10, desired_stock = 64, stock = 10, buy_price = 20, sell_price = 10},
-      electronics = {base_price = 10, desired_stock = 64, stock = 10, buy_price = 20, sell_price = 10},
+      tax_rate = 0,
+      medicine = {base_price = 10, desired_stock = 64, stock = 64, buy_price = 20, sell_price = 10},
+      parcels = {base_price = 10, desired_stock = 64, stock = 64, buy_price = 20, sell_price = 10},
+      machinery = {base_price = 10, desired_stock = 64, stock = 64, buy_price = 20, sell_price = 10},
+      electronics = {base_price = 10, desired_stock = 64, stock = 64, buy_price = 20, sell_price = 10},
     }
   },
   fueler = {
@@ -102,9 +103,9 @@ gs = {
 }
 ticker = 0
 music_ticker = 10000
-win_amount = 1000 --k$
+win_amount = 10 --k$
 customs_amount = 0.1 --k$
-lose_amount = 100
+lose_amount = 0
 trade_goods = {'medicine','parcels','machinery','electronics','fuel'}
 trade_good_info = {
   medicine = {sprite_id = 64, base_price = 10, bulk = 1},
