@@ -314,14 +314,13 @@ function wandering_interface()
   local slf = interface()
   slf._current_splat='player'
   --TODO the list of actors really needs to come from somewhere else...
-  slf.actors = {'player','customs','trader','fueler','armsdealer','travel_console'}
+  slf.actors = {'player','customs','trader','fueler','travel_console'}
   slf._splat = nil
   slf._splats = {
     ['player']= splat('player',{ref='player',w=8,h=8}),
     ['customs']= splat('customs',{ref='customs',text='customs',t_center=true,at_y=8,w=8,h=8}),
     ['trader']= splat('trader',{ref='trader',text='trader',t_center=true,at_y=8,w=8,h=8}),
     ['fueler']= splat('fueler',{ref='fueler',text='fueler',t_center=true,at_y=8,w=8,h=8}),
-    ['armsdealer']= splat('armsdealer',{ref='armsdealer',text='armsdealer',t_center=true,at_y=8,w=8,h=8}),
     ['travel_console']= splat('travel_console',{ref='travel_console',text='travel',t_center=true,at_y=8,w=8,h=8}),
     ['a_prompt']= splat('a_prompt',{ref='a_prompt',t_center=true,a_y=8,w=8,h=8}),
   }

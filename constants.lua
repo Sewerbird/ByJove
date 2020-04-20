@@ -43,7 +43,6 @@ gs = {
       fuel = {base_price = 5, desired_stock = 64, stock = 127, buy_price = 20, sell_price = 2},
     }
   },
-  armsdealer = {sprite=11,text='armsdealer',w=8,h=8,x=160,y=40},
   travel_console = {sprite=12,text='travel',w=8,h=8,x=80,y=104},
   tutorial_travel_console = {sprite=12,w=8,h=8,x=80,y=50},
   tutorial_player = { sprite=2,w=8,h=8,x=40,y=66 },
@@ -70,7 +69,6 @@ gs = {
       customs = {x=32,y=64,is_blocking=true},
       trader = {x=20,y=24},
       fueler = {x=40,y=104},
-      armsdealer = {x=160,y=40},
       a_prompt = {x=-100,y=-100},
       travel_console = {x=80,y=104},
     },
@@ -84,7 +82,6 @@ gs = {
       customs = {x=32,y=64,is_blocking=true},
       trader = {x=20,y=24},
       fueler = {x=40,y=104},
-      armsdealer = {x=160,y=40},
       a_prompt = {x=-100,y=-100},
       travel_console = {x=80,y=104},
     },
