@@ -463,7 +463,7 @@ function starport_scene(station_tag)
     ticker+=1
     music_ticker += 1
     if music_ticker > 5000 then
-      --music(0,300)
+      music(0,300)
       music_ticker = 0
     elseif music_ticker == 1150 then
       music(8)
@@ -637,7 +637,7 @@ end
 function tutorial_scene()
   local slf = scene()
   slf.draw = function(me)
-    map(53,2,32,42,8,4)
+    map(64,0,32,42-8,8,5)
     for k in all(me._interfaces) do
       me[k]:draw()
     end

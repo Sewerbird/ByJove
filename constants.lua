@@ -49,7 +49,7 @@ gs = {
   tutorial_player = { sprite=2,w=8,h=8,x=40,y=66 },
   a_prompt = {sprite=9,w=8,h=8,x=100,y=100},
   station_io = {
-    mx0=0,my0=32,mx1=16,my1=32,
+    mx0=32,my0=0,mx1=16,my1=32,
     planet="io",
     actors={
       player = {x=80,y=184},
@@ -62,7 +62,7 @@ gs = {
     },
   },
   station_europa = {
-    mx0=0,my0=0,mx1=32,my1=16,
+    mx0=48,my0=0,mx1=16,my1=32,
     planet="europa",
     actors={
       player = {x=52,y=104},
