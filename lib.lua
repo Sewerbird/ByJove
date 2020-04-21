@@ -6,10 +6,6 @@ function mod(num,range)
   return num-flr(num/range)*range
 end
 
-function round(num)
-  return(num-flr(num)>=0.5)and ceil(num) or flr(num)
-end
-
 function dsto(a,b)
   local dx=a.x-b.x
   local dy=a.y-b.y
@@ -24,16 +20,14 @@ function rects_intersect(a,b)
   return not(a.x+a.w<b.x or b.x+b.w<a.x or a.y+a.h<b.y or b.y+b.h<a.y)
 end
 
+function fmget(x,y,f)
+  return fget(mget(x,y),f)
+end
+
 function cmap(o)
-  local x1=o.x/8
-  local y1=o.y/8
-  local x2=(o.x+7)/8
-  local y2=(o.y+7)/8
-  local a=fget(mget(x1,y1),0)
-  local b=fget(mget(x1,y2),0)
-  local c=fget(mget(x2,y2),0)
-  local d=fget(mget(x2,y1),0)
-  return a or b or c or d
+  local x1,x2=o.x/8,(o.x+7)/8
+  local y1,y2=o.y/8,(o.y+7)/8
+  return fmget(x1,y1,0) or fmget(x1,y2,0) or fmget(x2,y2,0) or fmget(x2,y1,0) 
 end
 
 -- Gamestate Support
@@ -61,9 +55,7 @@ end
 
 function check_end_conditions()
   local end_condition = nil
-  --if player can't afford to get into a station
   if gs.player.business.balance < customs_amount then
-    --and player is locked out
     if gs.customs.is_blocking then
       printh("Player has lost via lockout")
       end_condition = "Refugee"
@@ -77,10 +69,6 @@ function check_end_conditions()
     gs.cs = "victory_scene"
   end
   return end_condition
-end
-
-function calculate_fuel_need(start,finish)
-  return gs[start].fuel_cost[finish]
 end
 
 function load_station(destination)
@@ -104,6 +92,67 @@ function load_station(destination)
   gs.starport = starport_scene(destination)
 end
 
+function buy_from_trader_action(trader_tag,good)
+  return function(me)
+    local amount = btn(1) and 5 or 1
+    printh("I can buy "..gs['player'].business.fuel_tank_free..' units of fuel')
+    if good == 'fuel' 
+      and gs['player'].business.balance > gs[trader_tag].business[good].sell_price * amount / 1000
+      and gs['player'].business.fuel_tank_free >= trade_good_info[good].bulk * amount
+      and gs[trader_tag].business[good].stock >= amount then
+      gs['player'].business.fuel_tank_used += amount*trade_good_info[good].bulk
+      gs['player'].business.fuel_tank_free -= amount*trade_good_info[good].bulk
+      gs['player'].business.balance -= gs[trader_tag].business[good].sell_price * amount / 1000
+      gs[trader_tag].business[good].stock -= amount
+      reevaluate_price(trader_tag,good)
+      gs[gs.cs].trading = trading_interface(trader_tag,'buy_'..good)
+      sfx(34)
+    elseif good ~= 'fuel' 
+      and gs['player'].business.balance > gs[trader_tag].business[good].sell_price * amount / 1000
+      and gs['player'].business.cargo_free >= trade_good_info[good].bulk * amount
+      and gs[trader_tag].business[good].stock >= amount then
+      gs['player'].business[good].stock += amount
+      gs['player'].business.cargo_free -= amount*trade_good_info[good].bulk
+      gs['player'].business.cargo_used += amount*trade_good_info[good].bulk
+      gs['player'].business.balance -= gs[trader_tag].business[good].sell_price * amount / 1000
+      gs[trader_tag].business[good].stock -= amount
+      reevaluate_price(trader_tag,good)
+      gs[gs.cs].trading = trading_interface(trader_tag,'buy_'..good)
+      sfx(34)
+    else
+      sfx(32)
+      printh("Not enough stock, space, and/or money")
+    end
+  end
+end
+
+function sell_to_trader_action(trader_tag,good)
+  return function(me)
+    local amount = btn(0) and 5 or 1
+    if good == 'fuel' and gs['player'].business.fuel_tank_used >= amount then
+      gs['player'].business.fuel.stock -= amount
+      gs['player'].business.fuel_tank_free += amount*trade_good_info[good].bulk
+      gs['player'].business.fuel_tank_used -= amount*trade_good_info[good].bulk
+      gs['player'].business.balance += gs[trader_tag].business[good].buy_price * amount / 1000
+      gs[trader_tag].business[good].stock += amount
+      reevaluate_price(trader_tag,good)
+      gs[gs.cs].trading = trading_interface(trader_tag,'sell_'..good)
+      sfx(33)
+    elseif good ~= 'fuel' and gs['player'].business[good].stock >= amount then
+      gs['player'].business[good].stock -= amount
+      gs['player'].business.cargo_free += amount*trade_good_info[good].bulk
+      gs['player'].business.cargo_used -= amount*trade_good_info[good].bulk
+      gs['player'].business.balance += gs[trader_tag].business[good].buy_price * amount / 1000
+      gs[trader_tag].business[good].stock += amount
+      reevaluate_price(trader_tag,good)
+      gs[gs.cs].trading = trading_interface(trader_tag,'sell_'..good)
+      sfx(33)
+    else
+      sfx(32)
+      printh("Not enough stock")
+    end
+  end
+end
 
 -- UI Support
 function scene()
@@ -231,4 +280,12 @@ function splat(tag,o)
     end
   end
   return me
+end
+
+function define_splats(mapping)
+  local splats = {}
+  for k,v in pairs(mapping) do
+    splats[k] = splat(k,v)
+  end
+  return splats
 end
