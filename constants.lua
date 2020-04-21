@@ -1,13 +1,13 @@
-get_xy = false
-skip_tutorial = false
-debug_collision = false
+get_xy = true
+skip_tutorial = true
+debug_collision = true
 --Game State
 gs = {
   ticker = 0,
   cs = "start_scene",
   current_station = "station_ganymede",
   player = {
-    sprite=2,w=8,h=8,x=52,y=104,
+    sprite=0,w=8,h=8,x=52,y=104,
     business = {
       tax_rate = 0,
       balance = 1,
@@ -50,36 +50,36 @@ gs = {
   a_prompt = {sprite=9,w=8,h=8,x=100,y=100},
   station_io = {
     mx0=32,my0=0,mx1=16,my1=32,
+    wall_color = 4,
     planet="io",
     actors={
       player = {x=80,y=184},
-      travel = {x=72,y=184},
       customs = {x=61,y=152,is_blocking=true},
       trader = {x=96,y=120},
       fueler = {x=96,y=184},
       a_prompt = {x=-100,y=-100},
-      travel_console = {x=72,y=184},
+      travel_console = {x=64,y=184},
     },
   },
   station_europa = {
     mx0=48,my0=0,mx1=16,my1=32,
     planet="europa",
+    wall_color=3,
     actors={
-      player = {x=52,y=104},
-      travel = {x=80,y=104},
-      customs = {x=32,y=64,is_blocking=true},
-      trader = {x=20,y=24},
-      fueler = {x=40,y=104},
+      player = {x=80,y=32},
+      customs = {x=80,y=96,is_blocking=true},
+      trader = {x=16,y=96},
+      fueler = {x=96,y=32},
       a_prompt = {x=-100,y=-100},
-      travel_console = {x=80,y=104},
+      travel_console = {x=64,y=32},
     },
   },
   station_ganymede = {
     mx0=0,my0=0,mx1=32,my1=16,
     planet="ganymede",
+    wall_color=5,
     actors={
       player = {x=52,y=104},
-      travel = {x=80,y=104},
       customs = {x=32,y=64,is_blocking=true},
       trader = {x=20,y=24},
       fueler = {x=40,y=104},
@@ -90,9 +90,9 @@ gs = {
   station_callisto = {
     mx0=0,my0=16,mx1=32,my1=16,
     planet="callisto",
+    wall_color=2,
     actors={
       player = {x=104,y=88},
-      travel = {x=120,y=108},
       customs = {x=86,y=48,is_blocking=true},
       trader = {x=144,y=32},
       fueler = {x=80,y=88},
@@ -148,9 +148,10 @@ planets = {
     }
   }
 }
+--Creates 500 x,y pairs to be reused for star effects, with a random color
 stars = {}
 for i=1,500 do
-  add(stars,{x= rnd(), y= rnd()})
+  add(stars,{x= rnd(), y= rnd(), c = flr(rnd()*8)})
 end
 neg_ln = {
 [1]= 0,

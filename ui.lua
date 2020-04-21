@@ -339,8 +339,8 @@ function wandering_interface()
     --Check collision with actors
     local bumped = false
     local player = {
-      x = gs['player'].x + dx,
-      y = gs['player'].y + dy,
+      x = moffx*8 + gs['player'].x + dx,
+      y = moffy*8 + gs['player'].y + dy,
       w = gs['player'].w,
       h = gs['player'].h,
     }
@@ -351,25 +351,24 @@ function wandering_interface()
         bumped = true
       end
     end
-    --Check collision with map
-    my_mx = x/8+moffx
-    my_dmx = (4*sgn(dx)+4)/8
-    my_my = y/8+moffy-1/8
-    my_dmy = (4*sgn(dy)+4)/8
-    my_tx1 = my_mx + my_dmx
-    my_ty1 = my_my+0.5
-    my_tx2 = my_mx + 0.5
-    my_ty2 = my_my+my_dmy
-    printh("==========")
-    printh("I think I am at mget = ("..my_mx..","..my_my..")")
-    printh("==========")
-    if not bumped and not fget(mget(my_tx1,my_ty1),0) then
-      gs['player'].x += dx
+    if not bumped then
+      --Check collision with map
+      if not cmap(player) then
+        gs['player'].x += dx
+        gs['player'].y += dy
+      else
+        player.x -= dx
+        if not cmap(player) then
+          gs['player'].y+= dy
+        else
+          player.x += dx
+          player.y -= dy
+          if not cmap(player) then
+            gs['player'].x+= dx
+          end
+        end
+      end
     end
-    if not bumped and not fget(mget(my_tx2,my_ty2),0) then
-      gs['player'].y += dy
-    end
-    --Check walking sound
     if dx > 0 or dx < 0 then 
       if not gs['player'].is_walking then
         gs['player'].is_walking = true
@@ -444,7 +443,7 @@ function starport_scene(station_tag)
   slf.draw = function(me)
     srand(ticker)
     for v in all(stars) do
-      circ(mod(ticker/10+v.x*127,256),sin(ticker/5000)*10+v.y*257,0,5)
+      circ(mod(ticker/10+v.x*255,s.mx1*8),sin(ticker/5000)*10+v.y*s.my1*8,0,5)
     end
     palt(0,false)
     palt(14,true)

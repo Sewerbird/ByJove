@@ -6,6 +6,10 @@ function mod(num,range)
   return num - flr(num/range)*range
 end
 
+function round(num)
+  return (num - flr(num) >=0.5) and ceil(num) or flr(num)
+end
+
 function dsto(a,b)
   local dx = a.x-b.x
   local dy = a.y-b.y
@@ -19,6 +23,18 @@ end
 function rects_intersect(a,b)
   --Note: Both a and b must have x,y,w,h
   return not (a.x+a.w<b.x or b.x+b.w<a.x or a.y+a.h<b.y or b.y+b.h<a.y)
+end
+
+function cmap(o)
+  local x1=o.x/8
+  local y1=o.y/8
+  local x2=(o.x+7)/8
+  local y2=(o.y+7)/8
+  local a=fget(mget(x1,y1),0)
+  local b=fget(mget(x1,y2),0)
+  local c=fget(mget(x2,y2),0)
+  local d=fget(mget(x2,y1),0)
+  return a or b or c or d
 end
 
 -- Gamestate Support
