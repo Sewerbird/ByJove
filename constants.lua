@@ -1,13 +1,12 @@
 get_xy = true
-skip_tutorial = true
-debug_collision = true
+skip_tutorial = false
 --Game State
 gs = {
   ticker = 0,
   cs = "start_scene",
   current_station = "station_ganymede",
   player = {
-    sprite=0,w=8,h=8,x=52,y=104,
+    sprite=2,w=8,h=8,x=52,y=104,
     business = {
       tax_rate = 0,
       balance = 1,
@@ -52,6 +51,12 @@ gs = {
     mx0=32,my0=0,mx1=16,my1=32,
     wall_color = 4,
     planet="io",
+    fuel_cost= {
+      station_io = 0,
+      station_europa = 30,
+      station_ganymede = 60,
+      station_callisto = 90,
+    },
     actors={
       player = {x=80,y=184},
       customs = {x=61,y=152,is_blocking=true},
@@ -63,8 +68,14 @@ gs = {
   },
   station_europa = {
     mx0=48,my0=0,mx1=16,my1=32,
-    planet="europa",
     wall_color=3,
+    planet="europa",
+    fuel_cost= {
+      station_io = 30,
+      station_europa = 0,
+      station_ganymede = 30,
+      station_callisto = 60,
+    },
     actors={
       player = {x=80,y=32},
       customs = {x=80,y=96,is_blocking=true},
@@ -76,8 +87,14 @@ gs = {
   },
   station_ganymede = {
     mx0=0,my0=0,mx1=32,my1=16,
-    planet="ganymede",
     wall_color=5,
+    planet="ganymede",
+    fuel_cost= {
+      station_io = 60,
+      station_europa = 30,
+      station_ganymede = 0,
+      station_callisto = 30,
+    },
     actors={
       player = {x=52,y=104},
       customs = {x=32,y=64,is_blocking=true},
@@ -89,8 +106,14 @@ gs = {
   },
   station_callisto = {
     mx0=0,my0=16,mx1=32,my1=16,
-    planet="callisto",
     wall_color=2,
+    planet="callisto",
+    fuel_cost= {
+      station_io = 90,
+      station_europa = 60,
+      station_ganymede = 30,
+      station_callisto = 0,
+    },
     actors={
       player = {x=104,y=88},
       customs = {x=86,y=48,is_blocking=true},
@@ -115,38 +138,10 @@ trade_good_info = {
   fuel = {sprite_id=68, base_price = 10, bulk = 1}
 }
 planets = {
-  io= {sprite_id=110,s_w=2,s_h=2,x=64-8-0,y=64-45,
-    fuel_cost= {
-      io = 0,
-      europa = 30,
-      ganymede = 60,
-      callisto = 90,
-    }
-  },
-  europa= {sprite_id=108,s_w=2,s_h=2,x=64-8-30,y=64-25,
-    fuel_cost= {
-      io = 30,
-      europa = 0,
-      ganymede = 30,
-      callisto = 60,
-    }
-  },
-  ganymede= {sprite_id=106,s_w=2,s_h=2,x=64-8-40,y=64+10,
-    fuel_cost= {
-      io = 60,
-      europa = 30,
-      ganymede = 0,
-      callisto = 30,
-    }
-  },
-  callisto= {sprite_id=104,s_w=2,x=64-8-35,y=64+40,s_h=2,
-    fuel_cost= {
-      io = 90,
-      europa = 60,
-      ganymede = 30,
-      callisto = 0,
-    }
-  }
+  io= { sprite_id=110,s_w=2,s_h=2,x=64-8-0,y=64-45 },
+  europa= {sprite_id=108,s_w=2,s_h=2,x=64-8-30,y=64-25},
+  ganymede= {sprite_id=106,s_w=2,s_h=2,x=64-8-40,y=64+10},
+  callisto= {sprite_id=104,s_w=2,x=64-8-35,y=64+40,s_h=2},
 }
 --Creates 500 x,y pairs to be reused for star effects, with a random color
 stars = {}

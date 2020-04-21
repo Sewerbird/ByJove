@@ -1,19 +1,19 @@
 function sgn(num)
-  return (num > 0 and 1 or (num < 0 and -1 or 0))
+  return(num>0 and 1 or (num<0 and -1 or 0))
 end
 
 function mod(num,range)
-  return num - flr(num/range)*range
+  return num-flr(num/range)*range
 end
 
 function round(num)
-  return (num - flr(num) >=0.5) and ceil(num) or flr(num)
+  return(num-flr(num)>=0.5)and ceil(num) or flr(num)
 end
 
 function dsto(a,b)
-  local dx = a.x-b.x
-  local dy = a.y-b.y
-  return sqrt(dx*dx + dy*dy)
+  local dx=a.x-b.x
+  local dy=a.y-b.y
+  return sqrt(dx*dx+dy*dy)
 end
 
 function clamp(x,a,b)
@@ -21,8 +21,7 @@ function clamp(x,a,b)
 end
 
 function rects_intersect(a,b)
-  --Note: Both a and b must have x,y,w,h
-  return not (a.x+a.w<b.x or b.x+b.w<a.x or a.y+a.h<b.y or b.y+b.h<a.y)
+  return not(a.x+a.w<b.x or b.x+b.w<a.x or a.y+a.h<b.y or b.y+b.h<a.y)
 end
 
 function cmap(o)
@@ -81,13 +80,13 @@ function check_end_conditions()
 end
 
 function calculate_fuel_need(start,finish)
-  return planets[start].fuel_cost[finish]
+  return gs[start].fuel_cost[finish]
 end
 
 function load_station(destination)
   gs.cs = 'starport'
   --Load up station-specific attributes for the station actors
-  local s = gs['station_'..destination]
+  local s = gs[destination]
   for key, spec in pairs(s.actors) do
     if gs[key] then
       gs[key].x = spec.x
@@ -102,7 +101,7 @@ function load_station(destination)
     end
   end
   --Load the station
-  gs.starport = starport_scene('station_'..destination)
+  gs.starport = starport_scene(destination)
 end
 
 
@@ -124,13 +123,15 @@ function scene()
       del(me._interfaces, me._interfaces[#me._interfaces])
     end
   end
-  slf.draw = function(me)
+  slf._draw = function(me)
+    if me.draw then me:draw() end
     for k in all(me._interfaces) do
-      me[k]:draw()
+      me[k]:_draw()
     end
   end
-  slf.update = function(me)
-    me[me:interface()]:update()
+  slf._update = function(me)
+    if me.update then me:update() end
+    me[me:interface()]:_update()
   end
   slf.execute = function(me)
     me[me:interface()]:execute()
@@ -148,13 +149,14 @@ function interface()
   slf.current_splat = function(me)
     return me._splats[me._current_splat]
   end
-  slf.draw = function(me)
+  slf._draw = function(me)
     if me._splat ~= nil then me._splat:draw() end
+    if me.draw then me:draw() end
     for _,splat in pairs(me._splats) do
       splat:draw()
     end
   end
-  slf.update = function(me)
+  slf._update = function(me)
     camera(0,0)
     local dir = nil
     if btnp(0) then dir = 'left' end
@@ -168,6 +170,7 @@ function interface()
     end
     if btnp(4) then gs[gs.cs]:pop_interface() end
     if btnp(5) then me:execute() end
+    if me.update then me:update() end
     for _,splat in pairs(me._splats) do
       splat:update()
     end
@@ -199,9 +202,7 @@ function splat(tag,o)
     execute=function(me)printh("Executing tag "..me.tag)end
   }) do me[k] = o[k] or v end
   me.draw=function(me)
-    if me.hidden then
-      return
-    end
+    if me.hidden then return end
     local c_f = me.active and me.c_fa or me.c_f
     local c_b = me.active and me.c_ba or me.c_b
     local l_x,t_y=me.x-me.a_x,me.y-me.a_y

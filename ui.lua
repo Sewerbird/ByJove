@@ -52,6 +52,7 @@ function travelling_interface(active_splat)
   local scene = gs.cs
   local current_station = gs[scene].current_station
   slf._current_splat='planet_'..gs[current_station].planet
+  printh("current splat in travelling interface is " .. slf._current_splat)
   slf.draw = function(me)
     cls()
     srand(ticker)
@@ -60,49 +61,40 @@ function travelling_interface(active_splat)
     end
     circfill(127,-64,128,15)
     circfill(120,-70,128,4)
-    if me._splat ~= nil then me._splat:draw() end
-    for _,splat in pairs(me._splats) do
-      splat:draw()
-    end
     print("Travel to where?", 60,4,12)
   end
   slf._splat = splat('background',{ x=l_x,y=t_y,w=w,h=h,c_f=0 })
   ask_travel = function(tgt)
     return function()
-      if tgt == gs[gs[gs.cs].current_station].planet then
+      if tgt == current_station then
         sfx(37)
         gs[gs.cs]:pop_interface()
       else
         sfx(38)
         gs[gs.cs].destination_planet = tgt
-        gs[gs.cs].travel_dialog = travel_dialog(gs[current_station].planet,tgt)
+        gs[gs.cs].travel_dialog = travel_dialog(current_station,tgt)
         gs[gs.cs]:push_interface('travel_dialog')
       end
     end
   end
   local station = gs[gs[gs.cs].current_station]
-  printh(station.planet)
   local planet = planets[station.planet]
-  printh(planet.x..","..planet.y)
   local io = planets.io
   local europa = planets.europa
   local ganymede = planets.ganymede
   local callisto = planets.callisto
   slf._splats = {
-    planet_io = splat('planet_io',{s_circle=true,r=10,down="planet_europa",x=io.x,y=io.y,sprite=planets['io'].sprite_id,text='io',t_center=true,at_y=12,s_w=2,s_h=2,c_ba=12,w=16,h=16,execute=ask_travel('io')}),
-    planet_europa = splat('planet_europa',{s_circle=true,r=10,down="planet_ganymede",up="planet_io",x=europa.x,y=europa.y,sprite=planets['europa'].sprite_id,text='europa',t_center=true,at_y=12,s_w=2,s_h=2,c_ba=12,w=16,h=16,execute=ask_travel('europa')}),
-    planet_ganymede = splat('planet_ganymede',{s_circle=true,r=10,up="planet_europa",down="planet_callisto",x=ganymede.x,y=ganymede.y,sprite=planets['ganymede'].sprite_id,text='ganymede',t_center=true,at_y=12,s_w=2,s_h=2,c_ba=12,w=16,h=16,execute=ask_travel('ganymede')}),
-    planet_callisto = splat('planet_callisto',{s_circle=true,r=10,up="planet_ganymede",x=callisto.x,y=callisto.y,sprite=planets['callisto'].sprite_id,text='callisto',t_center=true,at_y=12,s_w=2,s_h=2,c_ba=12,w=16,h=16,execute=ask_travel('callisto')}),
+    planet_io = splat('planet_io',{s_circle=true,r=10,down="planet_europa",x=io.x,y=io.y,sprite=planets['io'].sprite_id,text='io',t_center=true,at_y=12,s_w=2,s_h=2,c_ba=12,w=16,h=16,execute=ask_travel('station_io')}),
+    planet_europa = splat('planet_europa',{s_circle=true,r=10,down="planet_ganymede",up="planet_io",x=europa.x,y=europa.y,sprite=planets['europa'].sprite_id,text='europa',t_center=true,at_y=12,s_w=2,s_h=2,c_ba=12,w=16,h=16,execute=ask_travel('station_europa')}),
+    planet_ganymede = splat('planet_ganymede',{s_circle=true,r=10,up="planet_europa",down="planet_callisto",x=ganymede.x,y=ganymede.y,sprite=planets['ganymede'].sprite_id,text='ganymede',t_center=true,at_y=12,s_w=2,s_h=2,c_ba=12,w=16,h=16,execute=ask_travel('station_ganymede')}),
+    planet_callisto = splat('planet_callisto',{s_circle=true,r=10,up="planet_ganymede",x=callisto.x,y=callisto.y,sprite=planets['callisto'].sprite_id,text='callisto',t_center=true,at_y=12,s_w=2,s_h=2,c_ba=12,w=16,h=16,execute=ask_travel('station_callisto')}),
     ur_here = splat('ur_here',{sprite=112,x=planet.x+20,y=planet.y+8,at_x=10,at_y=8,c_t=11,text="yOU ARE\nhERE"})
   }
-  printh(slf._current_splat)
-  printh(slf._splats[slf._current_splat])
   slf._splats[slf._current_splat].active = true
   return slf
 end
 
 function trading_interface(trader_tag,active_splat)
-  --TODO make this based on merchant business object
   local trader_business = gs[trader_tag].business
   local player_business = gs['player'].business
   -- A trade dialog
@@ -118,26 +110,10 @@ function trading_interface(trader_tag,active_splat)
       add(my_trade_goods,good)
     end
   end
-  printh(my_trade_goods[1])
   slf._current_splat=active_splat or 'buy_'..my_trade_goods[1]
   slf.update = function(me)
     if btnp(4) then
       sfx(37)
-      gs[gs.cs]:pop_interface()
-    end
-    local dir = nil
-    if btnp(0) then dir = 'left' end
-    if btnp(1) then dir = 'right' end
-    if btnp(2) then dir = 'up' end
-    if btnp(3) then dir = 'down' end
-    if dir and me._current_splat and me._splats[me._current_splat][dir] != nil then
-      me._splats[me._current_splat].active = false
-      me._current_splat = me._splats[me._current_splat][dir]
-      me._splats[me._current_splat].active = true
-    end
-    if btnp(5) then me:execute() end
-    for _,splat in pairs(me._splats) do
-      splat:update()
     end
   end
   slf._splats = {}
@@ -258,6 +234,7 @@ function talk_interface()
   local slf = interface()
   local player_business = gs['player'].business
   slf._current_splat='pay_customs'
+  slf._splat = nil
   local prompt = ""
   if gs['customs'].is_blocking then
     if player_business.balance >= 0.1 then
@@ -275,29 +252,12 @@ function talk_interface()
       x=64+uix,y=94+uiy,w=20,h=9,t_center=true,text="$"..(player_business.balance*1000),c_b=13,c_f=1,c_t=11
     })
   }
-  slf.draw = function(me)
-    me._splats.text_area:draw()
-    me._splats.pay_customs:draw()
-    me._splats.wallet:draw()
-  end
   slf.update = function(me)
     if btnp(4) then
       sfx(37)
       gs[gs.cs]:pop_interface()
     end
-    local dir = nil
-    if btnp(0) then dir = 'left' end
-    if btnp(1) then dir = 'right' end
-    if btnp(2) then dir = 'up' end
-    if btnp(3) then dir = 'down' end
-    local current_splat = me:current_splat()
-    if dir and current_splat and current_splat[dir] then
-      me:current_splat().active = false
-      me._current_splat = current_splat[dir]
-      me:current_splat().active = true
-    end
     if btnp(5) then 
-      --TODO remove cash
       if gs['customs'].is_blocking and gs['player'].business.balance >= customs_amount then
         gs['player'].business.balance -= customs_amount
         gs['customs'].is_blocking = false
@@ -312,7 +272,7 @@ function talk_interface()
   return slf
 end
 
-function wandering_interface()
+function wandering_interface(moffx, moffy)
   local slf = interface()
   slf._current_splat='player'
   --TODO the list of actors really needs to come from somewhere else...
@@ -399,36 +359,27 @@ function wandering_interface()
     --Handle pressing 'A' to activate an NPC
     if me.target_npc and btnp(5) then
       sfx(-1,1) 
-      printh("Pressed a at "..me.target_npc)
       sfx(35)
       if me.target_npc == "customs" then
-        printh("talkig to customs")
         gs[gs.cs].talking = talk_interface(slf._current_splat)
         sfx(38)
         gs[gs.cs]:push_interface('talking')
       end
       if me.target_npc == "trader" then
-        printh("Talking to trader")
         gs[gs.cs].trading = trading_interface(me.target_npc)
         sfx(38)
         gs[gs.cs]:push_interface('trading')
       end
       if me.target_npc == "fueler" then
-        printh("Talking to fueler")
         gs[gs.cs].trading = trading_interface(me.target_npc)
         sfx(38)
         gs[gs.cs]:push_interface('trading')
       end
       if me.target_npc == "travel_console" then
-        printh("Tlaking to computer")
         gs[gs.cs].travelling = travelling_interface(slf._current_splat)
         sfx(38)
         gs[gs.cs]:push_interface('travelling')
       end
-    end
-    --Update sub elements
-    for _,splat in pairs(me._splats) do
-      splat:update()
     end
   end
   return slf
@@ -447,16 +398,9 @@ function starport_scene(station_tag)
     end
     palt(0,false)
     palt(14,true)
+    pal(5,s.wall_color)
     map(s.mx0,s.my0,0,0,s.mx1,s.my1)
-    palt()
-    for k in all(me._interfaces) do
-      me[k]:draw()
-    end
-    --TODO
-    if debug_collision and my_tx1 and my_ty1 then
-      circ(my_tx1*8,my_ty1*8,0,8)
-      circ(my_tx2*8,my_ty2*8,0,11)
-    end
+    pal()
   end
   slf.update = function(me)
     ticker+=1
@@ -469,17 +413,10 @@ function starport_scene(station_tag)
     end
     uix = clamp(gs['player'].x-64,0,s.mx1*8-127)
     uiy = clamp(gs['player'].y-64,0,s.my1*8-127)
-    camera( 
-      uix,
-      uiy
-      )
-    me[me:interface()]:update()
+    camera(uix, uiy)
   end
   -- Player wandering a map, able to bump into walls and interact with Things
-  slf.wandering = wandering_interface()
-  --TODO this is terrible
-  moffx = s.mx0
-  moffy = s.my0
+  slf.wandering = wandering_interface(s.mx0,s.my0)
   slf:push_interface("wandering")
 
   return slf
@@ -546,9 +483,6 @@ function victory_interface()
     circ(127,220,180,4)
     circfill(127,120,64,15)
     circfill(127,127,64,4)
-    for _,splat in pairs(me._splats) do
-      splat:draw()
-    end
   end
   return slf
 end
@@ -624,11 +558,6 @@ function tutorial_interface()
       slf._splats.act_btn.hidden = true
       slf._splats.goal_msg.hidden = true
     end
-
-    --Update sub elements
-    for _,splat in pairs(me._splats) do
-      splat:update()
-    end
   end
   return slf
 end
@@ -637,9 +566,6 @@ function tutorial_scene()
   local slf = scene()
   slf.draw = function(me)
     map(64,0,32,42-8,8,5)
-    for k in all(me._interfaces) do
-      me[k]:draw()
-    end
   end
   slf.teaching = tutorial_interface()
   sfx(38)
@@ -669,20 +595,8 @@ function start_scene()
     for i=0,300 do
       circ(mod(ticker/10+rnd()*256,256),sin(ticker/5000)*10+rnd()*127,0,7)
     end
-    palt(0,false)
-    palt(14,true)
-    palt()
     circfill(64,120,64,15)
     circfill(64,127,64,4)
-    for k in all(me._interfaces) do
-      me[k]:draw()
-    end
-  end
-  slf.update = function(me)
-    if btnp(5) then me[me:interface()]:execute() end
-    for k in all(me._interfaces) do
-      me[k]:update()
-    end
   end
   slf.starting = starting_interface()
   slf:push_interface("starting")
