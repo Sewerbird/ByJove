@@ -5,14 +5,14 @@ function travel_dialog(here,destination)
   local l_x = 32
   local t_y = 32
   local c_x = 64
-  local fuel_need = gs[start].fuel_cost[finish]
+  local fuel_need = gs[here].fuel_cost[destination]
   local trip_time = fuel_need/6
   local has_the_fuel =gs['player'].business.fuel_tank_used >= fuel_need 
   slf._current_splat= has_the_fuel and 'ok_button' or 'cancel_button'
-  slf._splat = splat('background',{ x=l_x,y=t_y,w=w,h=h,c_b=13,c_f=1 })
+  local text = "Travelling to\n"..gs[destination].planet.."\nFuel needed:"..fuel_need.."\nDays: "..flr(trip_time).." days"
+  slf._splat = splat('background',{ x=l_x,y=t_y,w=w,h=h,c_b=13,c_f=1,text = text,t_center=false, at_x=2, at_y=2})
   slf._splats = define_splats({
     header = { x=c_x-32,y=t_y-10,w=30,h=10,text="Travel?",c_b=13,c_f=1 },
-    explain = { x=c_x-32,y=t_y,at_x=2,at_y=2,w=w,text = "Travelling to\n"..destination.."\nFuel needed:"..fuel_need.."\nDays: "..flr(trip_time).." days",h=h,c_b=13, t_center=false},
     no_fuel = { hidden=has_the_fuel,x=c_x,y=t_y+h/2,text="Not enough fuel",c_t=8},
     ok_button = { right = 'cancel_button', x=c_x-32,y=t_y+h,w=30,h=10,text="okay",c_b=13,c_f=1,active=has_the_fuel,hidden=not has_the_fuel,
       execute = function() 
@@ -347,7 +347,7 @@ function bankruptcy_scene()
   local slf = scene()
   gs.ticker = 0
   text = "bANKRUPT...\n\nunable to muster\nany funds from\nyour coffers\nyou find yourself\nunable to continue\n\nreset to try again"
-  slf.losing = game_over_interface('bankruptcy',text))
+  slf.losing = game_over_interface('bankruptcy',text)
   sfx(37)
   slf:push_interface("losing")
   return slf
@@ -357,7 +357,7 @@ function victory_scene()
   local slf = scene()
   gs.ticker = 0
   text = "yOU wON!\n\nhaving amassed\n$1,000,000\nyou are wealthy\nenough to\nretire\n\ncongratulations!"
-  slf.winning = game_over_interface('wealthy',text))
+  slf.winning = game_over_interface('wealthy',text)
   sfx(38)
   slf:push_interface("winning")
   return slf
@@ -371,8 +371,8 @@ function tutorial_interface()
     tutorial_player = {ref='tutorial_player',w=8,h=8,sprite=7},
     tutorial_travel_console = {ref='tutorial_travel_console',x=80,y=50,w=8,h=8,sprite=12},
     step_1 = {x=64,y=80,text="Move around with your arrow keys"},
-    step_2 = {x=64,y=80,sprite=9,as_x=16,hidden=true,text="When you see '   ', \npress x to interact",t_lines=2,h=8},
-    step_3 = {x=64,y=80,text="Your goal is to\nmake $10,000 by\ntrading on the\nJovian moons.",t_lines=4},
+    step_2 = {x=64,y=80,text="Your goal is to\nmake $10,000 by\ntrading on the\nJovian moons.",t_lines=4},
+    step_3 = {x=64,y=80,sprite=9,as_x=16,hidden=true,text="When you see '   ', \npress x to interact",t_lines=2,h=8},
     step_4 = {x=64,y=80,text="To exit a dialog,\npress o at any time.\n\nDo so now to begin!",t_lines=3},
     a_prompt = {ref='a_prompt',a_y=8,w=8,h=8},
   })
@@ -399,7 +399,7 @@ function tutorial_interface()
     slf._splats.step_4.hidden = true
     --Show travel console prompt
     local console_distance = dsto(player,gs['tutorial_travel_console'])
-    if console_distance< 10 then
+    if console_distance > 10 then
       gs['a_prompt'].x = -100
       gs['a_prompt'].y = -100
     else
@@ -409,19 +409,20 @@ function tutorial_interface()
     --Handle tutorial messages
     if console_distance > 40 then
       slf._current_splat = "step_1"
-      slf._splats.step_1.hidden = false
+      slf._splats['step_1'].hidden = false
     elseif console_distance > 10 then
       slf._current_splat = "step_2"
-      slf._splats.step_2.hidden = false
-    elseif slf._current_splat = "step_2" and console_distance <= 10 then
+      slf._splats['step_2'].hidden = false
+    elseif (slf._current_splat == "step_3" and not btnp(5)) or (slf._current_splat == "step_2" and console_distance <= 10) then
       slf._current_splat = "step_3"
-      slf._splats.step_3.hidden = false
-    elseif slf._current_splat = "step_3" and btnp(5) then
+      slf._splats['step_3'].hidden = false
+    elseif (slf._current_splat == "step_4" and not btnp(4)) or (slf._current_splat == "step_3" and btnp(5)) then
       slf._current_splat = "step_4"
-      slf._splats.step_4.hidden = false
-    elseif slf._current_splat = "step_4" and btnp(4) then
+      slf._splats['step_4'].hidden = false
+    elseif slf._current_splat == "step_4" and btnp(4) then
       gs.starport_scene = starport_scene("station_ganymede")
       gs.cs = "starport_scene"
+    else
     end
   end
   return slf

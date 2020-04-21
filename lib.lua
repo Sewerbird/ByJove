@@ -249,7 +249,7 @@ function splat(tag,o)
       end
     end,
     execute=function(me)printh("Executing tag "..me.tag)end
-  }) do me[k] = o[k] or v end
+  }) do me[k] = o[k] == nil and v or o[k] end
   me.draw=function(me)
     if me.hidden then return end
     local c_f = me.active and me.c_fa or me.c_f
