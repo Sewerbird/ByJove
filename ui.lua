@@ -85,7 +85,7 @@ function trading_interface(trader_tag,active_splat)
   local w = 90
   local h = 50
   local c_x = 64+uix
-  local l_x = 64-w/2
+  local l_x = c_x-w/2
   local t_y = 64-h/2+uiy
   local trader_business = gs[trader_tag].business
   local player_business = gs['player'].business
