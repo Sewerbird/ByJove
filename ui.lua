@@ -355,10 +355,10 @@ function tutorial_interface()
   slf._splats = define_splats({
     tutorial_player = {ref='tutorial_player',w=8,h=8,sprite=7},
     tutorial_travel_console = {ref='tutorial_travel_console',x=80,y=50,w=8,h=8,sprite=12},
-    step_1 = {x=64,y=80,text="Move around with your arrow keys"},
-    step_2 = {x=64,y=80,text="Your goal is to\nmake $10,000 by\ntrading on the\nJovian moons.",t_lines=4},
-    step_3 = {x=64,y=80,sprite=9,as_x=16,hidden=true,text="When you see '   ', \npress x to interact",t_lines=2,h=8},
-    step_4 = {x=64,y=80,text="To exit a dialog,\npress o at any time.\n\nDo so now to begin!",t_lines=3},
+    step_1 = {x=64,y=40,text="Move around with your arrow keys"},
+    step_2 = {x=64,y=40,text="Your goal is to\nmake $10,000 by\ntrading on the\nJovian moons.",t_lines=4},
+    step_3 = {x=64,y=40,sprite=9,as_x=16,hidden=true,text="When you see '   ', \npress x to interact",t_lines=2,h=8},
+    step_4 = {x=64,y=40,text="To exit a dialog,\npress o at any time.\n\nDo so now to begin!",t_lines=3},
     a_prompt = {ref='a_prompt',a_y=8,w=8,h=8},
   })
   slf.update = function(me)
@@ -371,13 +371,13 @@ function tutorial_interface()
     if btn(3) then dy += 1 end
     --Check collision with actors and fake walls
     local player = {
-      x = gs['tutorial_player'].x + (gs['tutorial_player'].y==50 and dx or 0),
+      x = gs['tutorial_player'].x + (gs['tutorial_player'].y==50+40 and dx or 0),
       y = gs['tutorial_player'].y + dy,
       w = gs['tutorial_player'].w,
       h = gs['tutorial_player'].h,
     }
     gs['tutorial_player'].x = clamp(player.x,40,72)
-    gs['tutorial_player'].y = clamp(player.y,50,player.x == 72 and 66 or 50)
+    gs['tutorial_player'].y = clamp(player.y,50+40,player.x == 56 and 66+52 or 50+40)
     slf._splats.step_1.hidden = true
     slf._splats.step_2.hidden = true
     slf._splats.step_3.hidden = true
@@ -392,7 +392,7 @@ function tutorial_interface()
       gs['a_prompt'].y = gs['tutorial_travel_console'].y
     end
     --Handle tutorial messages
-    if console_distance > 40 then
+    if console_distance > 30 then
       slf._current_splat = "step_1"
       slf._splats['step_1'].hidden = false
     elseif console_distance > 10 then
@@ -416,7 +416,16 @@ end
 function tutorial_scene()
   local slf = scene()
   slf.draw = function(me)
-    map(0,0,32,42-16,7,6)
+    for v in all(stars) do
+      circ(mod(ticker/10+v.x*255,255),sin(ticker/5000)*10+v.y*127,0,5)
+    end
+    palt(0,false)
+    palt(14,true)
+    map(64,0,32,42-40+64,8,8)
+    pal()
+  end
+  slf.update = function(me)
+    ticker+= 1
   end
   sfx(38)
   slf:push_interface("teaching",tutorial_interface())

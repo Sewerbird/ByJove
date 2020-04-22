@@ -44,8 +44,8 @@ gs = {
     }
   },
   travel_console = {sprite=12,text='travel',w=8,h=8,x=80,y=104},
-  tutorial_travel_console = {sprite=13,w=8,h=8,x=40,y=50},
-  tutorial_player = { sprite=2,w=8,h=8,x=80-8,y=66 },
+  tutorial_travel_console = {sprite=12,w=8,h=8,x=80,y=50+40},
+  tutorial_player = { sprite=2,w=8,h=8,x=80-8-16,y=127-8 },
   a_prompt = {sprite=9,w=8,h=8,x=100,y=100},
   station_io = {
     mx0=32,my0=0,mx1=16,my1=32,
