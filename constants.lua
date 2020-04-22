@@ -44,8 +44,8 @@ gs = {
     }
   },
   travel_console = {sprite=12,text='travel',w=8,h=8,x=80,y=104},
-  tutorial_travel_console = {sprite=12,w=8,h=8,x=80,y=50},
-  tutorial_player = { sprite=2,w=8,h=8,x=40,y=66 },
+  tutorial_travel_console = {sprite=13,w=8,h=8,x=40,y=50},
+  tutorial_player = { sprite=2,w=8,h=8,x=80-8,y=66 },
   a_prompt = {sprite=9,w=8,h=8,x=100,y=100},
   station_io = {
     mx0=32,my0=0,mx1=16,my1=32,
@@ -63,7 +63,7 @@ gs = {
       trader = {x=96,y=120},
       fueler = {x=96,y=184},
       a_prompt = {x=-100,y=-100},
-      travel_console = {x=64,y=184},
+      travel_console = {x=64,y=184,sprite=13},
     },
   },
   station_europa = {
@@ -82,7 +82,7 @@ gs = {
       trader = {x=16,y=96},
       fueler = {x=96,y=32},
       a_prompt = {x=-100,y=-100},
-      travel_console = {x=64,y=32},
+      travel_console = {x=64,y=32,sprite=13},
     },
   },
   station_ganymede = {
@@ -101,7 +101,7 @@ gs = {
       trader = {x=20,y=24},
       fueler = {x=40,y=104},
       a_prompt = {x=-100,y=-100},
-      travel_console = {x=80,y=104},
+      travel_console = {x=80,y=104,sprite=12},
     },
   },
   station_callisto = {
@@ -120,7 +120,7 @@ gs = {
       trader = {x=144,y=32},
       fueler = {x=80,y=88},
       a_prompt = {x=-100,y=-100},
-      travel_console = {x=120,y=88},
+      travel_console = {x=120,y=88,sprite=12},
     },
   }
 }
@@ -131,17 +131,17 @@ customs_amount = 0.1 --k$
 lose_amount = 0
 trade_goods = {'medicine','parcels','machinery','electronics','fuel'}
 trade_good_info = {
-  medicine = {sprite_id = 64, base_price = 10, bulk = 1},
-  parcels = {sprite_id = 65, base_price = 20, bulk = 2},
-  machinery = {sprite_id = 66, base_price = 30, bulk = 3},
-  electronics = {sprite_id = 67, base_price = 40, bulk = 4},
-  fuel = {sprite_id=68, base_price = 10, bulk = 1}
+  medicine = {sprite_id = 43, base_price = 10, bulk = 1},
+  parcels = {sprite_id = 44, base_price = 20, bulk = 2},
+  machinery = {sprite_id = 45, base_price = 30, bulk = 3},
+  electronics = {sprite_id = 46, base_price = 40, bulk = 4},
+  fuel = {sprite_id=42, base_price = 10, bulk = 1}
 }
 planets = {
   io= { sprite_id=110,s_w=2,s_h=2,x=64-8-0,y=64-45 },
-  europa= {sprite_id=108,s_w=2,s_h=2,x=64-8-30,y=64-25},
-  ganymede= {sprite_id=106,s_w=2,s_h=2,x=64-8-40,y=64+10},
-  callisto= {sprite_id=104,s_w=2,x=64-8-35,y=64+40,s_h=2},
+  europa= {sprite_id=78,s_w=2,s_h=2,x=64-8-30,y=64-25},
+  ganymede= {sprite_id=108,s_w=2,s_h=2,x=64-8-40,y=64+10},
+  callisto= {sprite_id=76,s_w=2,x=64-8-35,y=64+40,s_h=2},
 }
 --Creates 500 x,y pairs to be reused for star effects, with a random color
 stars = {}

@@ -73,13 +73,14 @@ end
 
 function load_station(destination)
   gs.cs = 'starport'
+  gs['customs'].is_blocking = true
   --Load up station-specific attributes for the station actors
   local s = gs[destination]
   for key, spec in pairs(s.actors) do
     if gs[key] then
       gs[key].x = spec.x
       gs[key].y = spec.y
-      gs[key].is_blocking = spec.is_blocking
+      gs[key].sprite = spec.sprite or gs[key].sprite
       if spec.business then
         gs[key].business = spec.business
       end
@@ -162,14 +163,17 @@ function scene()
   slf.interface = function(me)
     return me._interfaces[#me._interfaces]
   end
-  slf.push_interface = function(me, interface_tag)
+  slf.push_interface = function(me, interface_tag, interface_object)
     add(me._interfaces, interface_tag)
+    me[interface_tag] = interface_object
   end
   slf.pop_interface = function(me,depth)
     depth = depth or 1
     for i =1,depth do
       if(#me._interfaces == 1) then return end
-      del(me._interfaces, me._interfaces[#me._interfaces])
+      tag = me._interfaces[#me._interfaces]
+      del(me._interfaces, tag)
+      me[tag] = nil
     end
   end
   slf._draw = function(me)

@@ -63,8 +63,7 @@ function travelling_interface(active_splat)
       else
         sfx(38)
         gs[gs.cs].destination_planet = tgt
-        gs[gs.cs].travel_dialog = travel_dialog(current_station,tgt)
-        gs[gs.cs]:push_interface('travel_dialog')
+        gs[gs.cs]:push_interface('travel_dialog',travel_dialog(current_station,tgt))
       end
     end
   end
@@ -137,22 +136,15 @@ end
 function tolling_interface()
   -- A tolling dialog to bar/allow entrance to station
   local slf = interface()
-  local player_business = gs['player'].business
-  local prompt = ""
-  if gs['customs'].is_blocking then
-    if player_business.balance >= 0.1 then --k$
-      prompt = "tHERE IS A \nDOCKING FEE\nTO ENTER THE\nSTARPORT.\n\nIT IS 100$"
-    else
-      prompt = "yOU DON'T SEEM\nTO BE ABLE\nTO AFFORD\nTHE DOCKING\nFEE of $100"
-    end
-  else
-    prompt = "yOU ARE FREE \nTO PASS.\n\ncARRY ON,\nCITIZEN"
-  end
+  local prompt = gs['customs'].is_blocking and ( gs['player'].business.balance >= 0.1 and 
+    "tHERE IS A \nDOCKING FEE\nTO ENTER THE\nSTARPORT.\n\nIT IS 100$"
+    or "yOU DON'T SEEM\nTO BE ABLE\nTO AFFORD\nTHE DOCKING\nFEE of $100"
+  ) or "yOU ARE FREE \nTO PASS.\n\ncARRY ON,\nCITIZEN"
   slf._current_splat='pay_customs'
   slf._splat = splat('text_area', {text=prompt,at_x=2,at_y=2,x=30+uix,y=30+uiy,w=64,h=64,c_f=1,c_b=13,t_center=false})
   slf._splats = define_splats({
     pay_customs= {x=62+uix,y=uiy+94-11,a_x=20,w=40,h=9,c_f=1,c_b=13,text="ok",active=true},
-    wallet= { x=64+uix,y=94+uiy,w=20,h=9,text="$"..(player_business.balance*1000),c_b=13,c_f=1,c_t=11 },
+    wallet= { x=64+uix,y=94+uiy,w=20,h=9,text="$"..(gs['player'].business.balance*1000),c_b=13,c_f=1,c_t=11 },
   })
   slf.update = function(me)
     if btnp(4) then
@@ -163,7 +155,6 @@ function tolling_interface()
       if gs['customs'].is_blocking and gs['player'].business.balance >= customs_amount then
         gs['player'].business.balance -= customs_amount
         gs['customs'].is_blocking = false
-        gs[gs.cs].tolling = tolling_interface()
         sfx(38)
       else
         sfx(37)
@@ -204,11 +195,22 @@ function wandering_interface(moffx, moffy)
       w = gs['player'].w,
       h = gs['player'].h,
     }
+    local player_screen = {
+      x = gs['player'].x + dx,
+      y = gs['player'].y + dy,
+      w = gs['player'].w,
+      h = gs['player'].h,
+    }
     --Check collision with sprites
     for actor in all(me.actors) do
       local obj = gs[actor]
-      if actor ~= 'player' and rects_intersect(obj,player) and obj.is_blocking then
-        bumped = true
+      if actor ~= 'player' and rects_intersect(obj,player_screen) then
+        if obj.is_blocking then
+          printh("blocking player with "..actor)
+          bumped = true
+        else
+          printh("not blocking player with "..actor)
+        end
       end
     end
     if not bumped then
@@ -229,15 +231,12 @@ function wandering_interface(moffx, moffy)
         end
       end
     end
-    if dx > 0 or dx < 0 then 
-      if not gs['player'].is_walking then
-        gs['player'].is_walking = true
-        sfx(36,60) 
-      end
-    end
     if dx == 0 and gs['player'].is_walking then
       gs['player'].is_walking = false
-      sfx(-1,60) 
+      sfx(-1,3) 
+    elseif dx ~= 0 and not gs['player'].is_walking then
+      gs['player'].is_walking = true
+      sfx(36,3) 
     end
     --Handle player being near an NPC
     local target_npc = nil
@@ -248,39 +247,31 @@ function wandering_interface(moffx, moffy)
         end
       end
     end
-    me.target_npc = target_npc
-    if me.target_npc then
-      gs['a_prompt'].x = gs[me.target_npc].x
-      gs['a_prompt'].y = gs[me.target_npc].y
+    if target_npc then
+      gs['a_prompt'].x = gs[target_npc].x
+      gs['a_prompt'].y = gs[target_npc].y
     else
       gs['a_prompt'].x = -100
       gs['a_prompt'].y = -100
     end
     --Handle pressing 'A' to activate an NPC
-    if me.target_npc and btnp(5) then
+    if target_npc and btnp(5) then
       sfx(-1,1) 
       sfx(35)
-      if me.target_npc == "customs" then
-        gs[gs.cs].tolling = tolling_interface(slf._current_splat)
+      if target_npc == "customs" then
         sfx(38)
-        gs[gs.cs]:push_interface('tolling')
+        gs[gs.cs]:push_interface('tolling',tolling_interface(slf._current_splat))
       end
-      if me.target_npc == "trader" then
-        gs[gs.cs].trading = trading_interface(me.target_npc)
+      if target_npc == "trader" or target_npc == "fueler" then
         sfx(38)
-        gs[gs.cs]:push_interface('trading')
+        gs[gs.cs]:push_interface('trading',trading_interface(target_npc))
       end
-      if me.target_npc == "fueler" then
-        gs[gs.cs].trading = trading_interface(me.target_npc)
+      if target_npc == "travel_console" then
         sfx(38)
-        gs[gs.cs]:push_interface('trading')
-      end
-      if me.target_npc == "travel_console" then
-        gs[gs.cs].travelling = travelling_interface(slf._current_splat)
-        sfx(38)
-        gs[gs.cs]:push_interface('travelling')
+        gs[gs.cs]:push_interface('travelling',travelling_interface(slf._current_splat))
       end
     end
+    me.target_npc = target_npc
   end
   return slf
 end
@@ -315,8 +306,7 @@ function starport_scene(station_tag)
     end
   end
   -- Player wandering a map, able to bump into walls and interact with Things
-  slf.wandering = wandering_interface(s.mx0,s.my0)
-  slf:push_interface("wandering")
+  slf:push_interface("wandering", wandering_interface(s.mx0,s.my0))
 
   return slf
 end
@@ -336,9 +326,6 @@ function game_over_interface(condition, text)
     circ(127,220,180,4)
     circfill(127,120,64,15)
     circfill(127,127,64,4)
-    for _,splat in pairs(me._splats) do
-      splat:draw()
-    end
   end
   return slf
 end
@@ -347,9 +334,8 @@ function bankruptcy_scene()
   local slf = scene()
   gs.ticker = 0
   text = "bANKRUPT...\n\nunable to muster\nany funds from\nyour coffers\nyou find yourself\nunable to continue\n\nreset to try again"
-  slf.losing = game_over_interface('bankruptcy',text)
   sfx(37)
-  slf:push_interface("losing")
+  slf:push_interface("losing",game_over_interface('bankruptcy',text))
   return slf
 end
 
@@ -357,9 +343,8 @@ function victory_scene()
   local slf = scene()
   gs.ticker = 0
   text = "yOU wON!\n\nhaving amassed\n$1,000,000\nyou are wealthy\nenough to\nretire\n\ncongratulations!"
-  slf.winning = game_over_interface('wealthy',text)
   sfx(38)
-  slf:push_interface("winning")
+  slf:push_interface("winning",game_over_interface('wealthy',text))
   return slf
 end
 
@@ -391,8 +376,8 @@ function tutorial_interface()
       w = gs['tutorial_player'].w,
       h = gs['tutorial_player'].h,
     }
-    gs['tutorial_player'].x = clamp(player.x,40,76)
-    gs['tutorial_player'].y = clamp(player.y,50,player.x == 40 and 66 or 50)
+    gs['tutorial_player'].x = clamp(player.x,40,72)
+    gs['tutorial_player'].y = clamp(player.y,50,player.x == 72 and 66 or 50)
     slf._splats.step_1.hidden = true
     slf._splats.step_2.hidden = true
     slf._splats.step_3.hidden = true
@@ -431,11 +416,10 @@ end
 function tutorial_scene()
   local slf = scene()
   slf.draw = function(me)
-    map(64,0,32,42-8,8,5)
+    map(0,0,32,42-16,7,6)
   end
-  slf.teaching = tutorial_interface()
   sfx(38)
-  slf:push_interface("teaching")
+  slf:push_interface("teaching",tutorial_interface())
   return slf
 end
 
@@ -464,8 +448,7 @@ function start_scene()
     circfill(64,120,64,15)
     circfill(64,127,64,4)
   end
-  slf.starting = starting_interface()
-  slf:push_interface("starting")
+  slf:push_interface("starting",starting_interface())
   return slf
 end
 
