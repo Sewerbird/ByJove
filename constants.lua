@@ -1,5 +1,7 @@
 get_xy = true
 skip_tutorial = false
+mute = true
+
 --Game State
 gs = {
   ticker = 0,
@@ -47,6 +49,18 @@ gs = {
   tutorial_travel_console = {sprite=12,w=8,h=8,x=80,y=50+40},
   tutorial_player = { sprite=2,w=8,h=8,x=80-8-16,y=127-8 },
   a_prompt = {sprite=9,w=8,h=8,x=100,y=100},
+  player_ship = {
+    mx0=64,my0=0,mx1=24,my1=24,
+    wall_color = 5,
+    actors={
+      player = {x=20,y=48},
+      customs = {x=-100,y=-100,is_blocking=true},
+      trader = {x=-100,y=-100},
+      fueler = {x=-100,y=-100},
+      a_prompt = {x=-100,y=-100},
+      travel_console = {x=-100,y=-100,sprite=13},
+    }
+  },
   station_io = {
     mx0=32,my0=0,mx1=16,my1=32,
     wall_color = 4,

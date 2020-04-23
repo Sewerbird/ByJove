@@ -21,7 +21,8 @@ function travel_dialog(here,destination)
         --TODO go to ship scene instead
         gs['player'].business.fuel_tank_used -= fuel_need
         gs['player'].business.fuel_tank_free += fuel_need
-        load_station(destination)
+        --load_station(destination)
+        load_station('player_ship')
       end
     },
     cancel_button = { left = 'ok_button', x=c_x+2,y=t_y+h,w=30,h=10,text="cancel",c_b=13,c_f=1,active=not has_the_fuel,
