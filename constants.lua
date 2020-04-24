@@ -4,10 +4,10 @@ mute = true
 
 --Game State
 gs = {
-  ticker = 0,
+  ticker = 0, --TODO: there is a global ticker too...
   cs = "start_scene",
   current_station = "station_ganymede",
-  player = {
+  player = create_player({
     sprite=2,w=8,h=8,x=52,y=104,
     business = {
       tax_rate = 0,
@@ -24,7 +24,7 @@ gs = {
       machinery = {stock = 0},
       electronics = {stock = 0},
     }
-  },
+  }),
   customs = {sprite=7,text='customs',w=8,h=8,x=32,y=64,is_blocking=true},
   trader = {
     sprite=8,text='trader',w=8,h=8,x=20,y=24,
@@ -139,6 +139,7 @@ gs = {
   }
 }
 ticker = 0
+ticks = 0 --TODO: adv_micro_platformer. Remove
 music_ticker = 10000
 win_amount = 10 --k$
 customs_amount = 0.1 --k$

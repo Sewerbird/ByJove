@@ -30,6 +30,14 @@ function cmap(o)
   return fmget(x1,y1,0) or fmget(x1,y2,0) or fmget(x2,y2,0) or fmget(x2,y1,0) 
 end
 
+--Adds extra fields to an object
+function merge(object,extra)
+  for k,v in extra do
+    object[k]=v
+  end
+  return object
+end
+
 -- Gamestate Support
 
 function reevaluate_price(trader, trade_good)
@@ -153,6 +161,68 @@ function sell_to_trader_action(trader_tag,good)
       printh("Not enough stock")
     end
   end
+end
+
+-- Platforming
+-- tile flag 0 == solid
+-- tile flag 1 == walk_on_top
+
+function collide_side(self)
+  --check if pushing into side tile and resolve.
+  --requires self.dx,self.x,self.y, and 
+   local offset=self.w/3
+   for i=-(self.w/3),(self.w/3),2 do
+     if fget(mget((self.x+(offset))/8,(self.y+i)/8),0) then
+         self.dx=0
+         self.x=(flr(((self.x+(offset))/8))*8)-(offset)
+         return true
+     end
+     if fget(mget((self.x-(offset))/8,(self.y+i)/8),0) then
+         self.dx=0
+         self.x=(flr((self.x-(offset))/8)*8)+8+(offset)
+         return true
+     end
+   end
+   --didn't hit a solid tile.
+   return false
+end
+
+function collide_floor(self)
+  --check if pushing into floor tile and resolve.
+  --requires self.dx,self.x,self.y,self.grounded,self.airtime and 
+   --only check for ground when falling.
+   if self.dy<0 then
+       return false
+   end
+   local landed=false
+   --check for collision at multiple points along the bottom
+   --of the sprite: left, center, and right.
+   for i=-(self.w/3),(self.w/3),2 do
+       local tile=mget((self.x+i)/8,(self.y+(self.h/2))/8)
+       if fget(tile,0) or (fget(tile,1) and self.dy>=0) then
+           self.dy=0
+           self.y=(flr((self.y+(self.h/2))/8)*8)-(self.h/2)
+           self.grounded=true
+           self.airtime=0
+           landed=true
+       end
+   end
+   return landed
+end
+
+function collide_roof(self)
+  --check if pushing into roof tile and resolve.
+  --requires self.dy,self.x,self.y, and 
+  --assumes tile flag 0 == solid
+   --check for collision at multiple points along the top
+   --of the sprite: left, center, and right.
+   for i=-(self.w/3),(self.w/3),2 do
+       if fget(mget((self.x+i)/8,(self.y-(self.h/2))/8),0) then
+           self.dy=0
+           self.y=flr((self.y-(self.h/2))/8)*8+8+(self.h/2)
+           self.jump_hold_time=0
+       end
+   end
 end
 
 -- UI Support
