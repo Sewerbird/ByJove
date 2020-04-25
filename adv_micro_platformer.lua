@@ -66,6 +66,7 @@
             slide= { ticks=1, frames={164,165,166,167,168,169,170,171}},
             jump = { ticks=1, frames={141}},
             climb = { ticks=2, frames={144,145,146,147}},
+            hold = {ticks=1, frames={145}},
 
             prone = { ticks=1, frames={32}},
             crouching = { ticks=1, frames={51}},
@@ -167,11 +168,9 @@
                    self.dy=0
                    self.y+=1
                    collide_roof(self)
-                 --elseif btn(5) then--X button: trying to jump off
-                   --TODO doesn't allow jumping off ladder atm
-                   --self.climbing = false
                  else
                    printh("holding")
+                   self:set_anim("hold")
                    --move in y
                    self.dy=0
                    self.y+=0
@@ -204,8 +203,8 @@
                    self.grounded=false
                    self.airtime+=1
                elseif not collide_floor(self) and self.nexting then
-                 self:set_anim("stand")
                  self.grounded=false
+                 if sqrt(self.dx*self.dx) < 0.1 then self:set_anim("stand") end
                  self.airtime+=1
                  collide_floor(self)
                end

@@ -74,7 +74,7 @@ function travelling_interface(active_splat)
     planet_europa = {s_circle=true,r=10,down="planet_ganymede",up="planet_io",x=planets.europa.x,y=planets.europa.y,sprite=planets.europa.sprite_id,text='europa',at_y=12,s_w=2,s_h=2,c_ba=12,w=16,h=16,execute=ask_travel('station_europa')},
     planet_ganymede = {s_circle=true,r=10,up="planet_europa",down="planet_callisto",x=planets.ganymede.x,y=planets.ganymede.y,sprite=planets.ganymede.sprite_id,text='ganymede',at_y=12,s_w=2,s_h=2,c_ba=12,w=16,h=16,execute=ask_travel('station_ganymede')},
     planet_callisto = {s_circle=true,r=10,up="planet_ganymede",x=planets.callisto.x,y=planets.callisto.y,sprite=planets.callisto.sprite_id,text='callisto',at_y=12,s_w=2,s_h=2,c_ba=12,w=16,h=16,execute=ask_travel('station_callisto')},
-    ur_here = {sprite=112,x=planet.x+20,y=planet.y+8,at_x=10,at_y=8,c_t=11,text="yOU ARE\nhERE",t_center=false},
+    ur_here = {sprite=41,x=planet.x+20,y=planet.y+8,at_x=10,at_y=8,c_t=11,text="yOU ARE\nhERE",t_center=false},
   })
   slf._splats[slf._current_splat].active = true
   return slf
@@ -376,7 +376,7 @@ function tutorial_scene()
     end
     palt(0,false)
     palt(14,true)
-    map(64,0,32,42-40+64,8,8)
+    map(64,0,32,42-40+40,8,12)
     pal()
   end
   slf.update = function(me)
