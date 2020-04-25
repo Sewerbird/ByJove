@@ -16,18 +16,18 @@
          dx=0, dy=0, 
          max_dx=1,--max x speed
          max_dy=2,--max y speed
-         jump_speed=-1.75,--jump veloclity
-         acc=0.05,--acceleration
-         dcc=0.8,--decceleration
+         jump_speed=-1.15,--jump veloclity
+         acc=0.5,--acceleration
+         dcc=0.4,--decceleration
          air_dcc=1,--air decceleration
-         grav=0.15,
+         grav=0.25,
          jump_hold_time=0,--how long jump is held
-         min_jump_press=5,--min time jump can be held
-         max_jump_press=15,--max time jump can be held
+         min_jump_press=3,--min time jump can be held
+         max_jump_press=6,--max time jump can be held
          jump_btn_released=true,--can we jump again?
          grounded=false,--on ground
          airtime=0,--time since grounded
-         curanim="walk",--currently playing animation
+         curanim="walking",--currently playing animation
          curframe=1,--curent frame of animation.
          animtick=0,--ticks until next frame should show.
          flipx=false,--show sprite be flipped.
@@ -61,14 +61,28 @@
          --use with set_anim()
          anims=
          {
-             ["stand"]= { ticks=1, frames={2} },
-             ["walk"]= { ticks=5, frames={3,4,5,6} },
-             ["jump"]= { ticks=1, frames={1}, },
-             ["slide"]= { ticks=1, frames={7}, },
+            stand = { ticks=1, frames={130}},
+            walk = { ticks=1, frames={180,181,182,183,184,185,186,187}},
+            slide= { ticks=1, frames={164,165,166,167,168,169,170,171}},
+            jump = { ticks=1, frames={141}},
+            climb = { ticks=2, frames={144,145,146,147}},
+
+            prone = { ticks=1, frames={32}},
+            crouching = { ticks=1, frames={51}},
+            jump_idle = { ticks=1, frames={14,15}},
+            jumpdown = { ticks=1, frames={15,14,13,12,11}},
+            dropdown = { ticks=1, frames={44,45,46,47,48,33,32}},
+            dropdown_gun = { ticks=1, frames={60,61,62,63,50,49,48}},
+            equip = { ticks=1, frames={1,2,3,4}},
+            unequip = { ticks=1, frames={4,3,2,1}},
+            standup = { ticks=1, frames={32,33,34,35,1}},
+            laydown = { ticks=1, frames={1,35,34,33,32}},
+            standup_gun = { ticks=1, frames={48,49,50,51,3}},
+            laydown_gun = { ticks=1, frames={3,51,50,49,48}},
          },
          --request new animation to play.
          set_anim=function(self,anim)
-             if(anim==self.curanim)return--early out.
+             if(anim==self.curanim) return--early out.
              local a=self.anims[anim]
              self.animtick=a.ticks--ticks count down.
              self.curanim=anim
@@ -93,10 +107,12 @@
                      self.dx*=self.air_dcc
                  end
              end
-             --limit walk speed
-             self.dx=mid(-self.max_dx,self.dx,self.max_dx)
-             --move in x
-             self.x+=self.dx
+             if not self.climbing then
+               --limit walk speed
+               self.dx=mid(-self.max_dx,self.dx,self.max_dx)
+               --mve in x
+               self.x+=self.dx
+             end
              --hit walls
              collide_side(self)
              --jump buttons
@@ -120,8 +136,8 @@
                  local new_jump_btn=self.jump_button.ticks_down<10
                  --is player continuing a jump
                  --or starting a new one?
-                 if self.jump_hold_time>0 or (on_ground and new_jump_btn) then
-                     if(self.jump_hold_time==0)sfx(snd.jump)--new jump snd
+                 if (on_ground and new_jump_btn) then
+                     --if(self.jump_hold_time==0)sfx(snd.jump)--new jump snd
                      self.jump_hold_time+=1
                      --keep applying jump velocity
                      --until max jump time.
@@ -132,20 +148,72 @@
              else
                  self.jump_hold_time=0
              end
-             --move in y
-             self.dy+=self.grav
-             self.dy=mid(-self.max_dy,self.dy,self.max_dy)
-             self.y+=self.dy
-             --floor
-             if not collide_floor(self) then
-                 self:set_anim("jump")
+             local can_ascend, can_descend, ladder_mid= collide_ladder(self)
+             if can_ascend or can_descend then
+               printh("can_ascend = "..(can_ascend and "true" or "false")..", can_descend = "..(can_descend and "true" or "false")..", ladder_mid"..ladder_mid)
+               --see if climbing
+               if self.climbing then
+                 --has grabbed the ladder and is moving up and down or staying still
+                 self.x = ladder_mid
+                 self.dx = 0
+                 if btn(2) then--up
+                   printh("ascending "..self.curanim)
+                   self:set_anim("climb")
+                   self.dy=0
+                   self.y-=1
+                 elseif btn(3) then--down
+                   printh("descending"..self.curanim)
+                   self:set_anim("climb")
+                   self.dy=0
+                   self.y+=1
+                   collide_roof(self)
+                 --elseif btn(5) then--X button: trying to jump off
+                   --TODO doesn't allow jumping off ladder atm
+                   --self.climbing = false
+                 else
+                   printh("holding")
+                   --move in y
+                   self.dy=0
+                   self.y+=0
+                 end
+               else
+                 --might be trying to start climb
+                 if (btn(2) and can_ascend) or (btn(3) and can_descend) then
+                   printh("grabbing")
+                   self.climbing = true
+                   self:set_anim("climb")
+                 else
+                   printh("nexting")
+                   self.nexting = true
+                 end
+               end
+             else
+               self.climbing = false
+               self.nexting = false
+               --move in y
+               self.dy+=self.grav
+               self.dy=mid(-self.max_dy,self.dy,self.max_dy)
+               self.y+=self.dy
+               collide_floor(self)
+             end
+             if not self.climbing then
+               --floor
+               if not collide_floor(self) and not self.nexting then
+                   printh("falling")
+                   self:set_anim("jump")
+                   self.grounded=false
+                   self.airtime+=1
+               elseif not collide_floor(self) and self.nexting then
+                 self:set_anim("stand")
                  self.grounded=false
                  self.airtime+=1
+                 collide_floor(self)
+               end
+               --roof
+               collide_roof(self)
              end
-             --roof
-             collide_roof(self)
              --handle playing correct animation when on the ground.
-             if self.grounded then
+             if self.grounded and not self.climbing then
                  if br then
                      if self.dx<0 then
                          --pressing right but still moving left.
@@ -185,12 +253,15 @@
          draw=function(self)
              local a=self.anims[self.curanim]
              local frame=a.frames[self.curframe]
+             palt(0,true)
              spr(frame,
                  self.x-(self.w/2),
                  self.y-(self.h/2),
                  self.w/8,self.h/8,
                  self.flipx,
                  false)
+             pal()
+
          end,
      }
 

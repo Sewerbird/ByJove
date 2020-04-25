@@ -21,8 +21,8 @@ function travel_dialog(here,destination)
         --TODO go to ship scene instead
         gs['player'].business.fuel_tank_used -= fuel_need
         gs['player'].business.fuel_tank_free += fuel_need
-        --load_station(destination)
-        load_station('player_ship')
+        load_station(destination)
+        --load_station('player_ship')
       end
     },
     cancel_button = { left = 'ok_button', x=c_x+2,y=t_y+h,w=30,h=10,text="cancel",c_b=13,c_f=1,active=not has_the_fuel,
@@ -166,91 +166,42 @@ function tolling_interface()
   return slf
 end
 
-function wandering_interface(moffx, moffy)
+function wandering_interface(station_tag)
   local slf = interface()
-  slf._current_splat='player'
+  slf._current_splat=nil
   --TODO the list of actors really needs to come from somewhere else...
-  slf.actors = {'player','customs','trader','fueler','travel_console'}
   slf._splat = nil
-  slf._splats = define_splats({
-    player= {ref='player',w=8,h=8},
-    customs= {ref='customs',text='customs',at_y=8,w=8,h=8},
-    trader= {ref='trader',text='trader',at_y=8,w=8,h=8},
-    fueler= {ref='fueler',text='fueler',at_y=8,w=8,h=8},
-    travel_console= {ref='travel_console',text='travel',at_y=8,w=8,h=8},
-    a_prompt= {ref='a_prompt',a_y=8,w=8,h=8},
-  })
+  slf._splats = {}
+  for k,v in pairs(gs[station_tag].actors) do
+    slf._splats[k] = splat(k,v)
+  end
   slf.update = function(me)
-    --Handle Motion
-    local dx = 0
-    local dy = 0
-    if btn(0) then dx -= 1 end
-    if btn(1) then dx += 1 end
-    if btn(2) then dy -= 1 end
-    if btn(3) then dy += 1 end
-    --Check collision with actors
-    local bumped = false
-    local player = {
-      x = moffx*8 + gs['player'].x + dx,
-      y = moffy*8 + gs['player'].y + dy,
-      w = gs['player'].w,
-      h = gs['player'].h,
-    }
-    local player_screen = {
-      x = gs['player'].x + dx,
-      y = gs['player'].y + dy,
-      w = gs['player'].w,
-      h = gs['player'].h,
-    }
     --Check collision with sprites
     for actor in all(me.actors) do
       local obj = gs[actor]
       if actor ~= 'player' and rects_intersect(obj,player_screen) then
         if obj.is_blocking then
           printh("blocking player with "..actor)
-          bumped = true
+          gs.player.bumped = true
         else
           printh("not blocking player with "..actor)
         end
       end
     end
-    if not bumped then
-      --Check collision with map
-      if not cmap(player) then
-        gs['player'].x += dx
-        gs['player'].y += dy
-      else
-        player.x -= dx
-        if not cmap(player) then
-          gs['player'].y+= dy
-        else
-          player.x += dx
-          player.y -= dy
-          if not cmap(player) then
-            gs['player'].x+= dx
-          end
-        end
-      end
-    end
-    if dx == 0 and gs['player'].is_walking then
-      gs['player'].is_walking = false
-      sfx(-1,3) 
-    elseif dx ~= 0 and not gs['player'].is_walking then
-      gs['player'].is_walking = true
-      sfx(36,3) 
-    end
+    --Move player according to rules
+    gs.player:update()
     --Handle player being near an NPC
     local target_npc = nil
-    for k in all(me.actors) do
-      if k != 'player' then
-        if dsto(gs[me._splats[k].ref], gs['player']) < 12 then
+    for k,v in pairs(gs[station_tag].actors) do
+      if k != 'player' and k != 'a_prompt' then
+        if dsto(v, gs['player']) < 12 then
           target_npc = k
         end
       end
     end
     if target_npc then
       gs['a_prompt'].x = gs[target_npc].x
-      gs['a_prompt'].y = gs[target_npc].y
+      gs['a_prompt'].y = gs[target_npc].y-8
     else
       gs['a_prompt'].x = -100
       gs['a_prompt'].y = -100
@@ -294,6 +245,7 @@ function starport_scene(station_tag)
     palt(14,true)
     pal(5,s.wall_color)
     map(s.mx0,s.my0,0,0,s.mx1,s.my1)
+    gs['player']:draw()
     pal()
   end
   slf.update = function(me)
@@ -307,7 +259,9 @@ function starport_scene(station_tag)
     end
   end
   -- Player wandering a map, able to bump into walls and interact with Things
-  slf:push_interface("wandering", wandering_interface(s.mx0,s.my0))
+  moffx = s.mx0
+  moffy = s.my0
+  slf:push_interface("wandering", wandering_interface(station_tag))
 
   return slf
 end

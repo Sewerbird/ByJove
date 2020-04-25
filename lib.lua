@@ -7,9 +7,10 @@ function mod(num,range)
 end
 
 function dsto(a,b)
-  local dx=a.x-b.x
-  local dy=a.y-b.y
-  return sqrt(dx*dx+dy*dy)
+  local dx=(a.x-b.x)/1000
+  local dy=(a.y-b.y)/1000
+  distance = sqrt(dx*dx + dy*dy)
+  return distance*1000
 end
 
 function clamp(x,a,b)
@@ -172,12 +173,12 @@ function collide_side(self)
   --requires self.dx,self.x,self.y, and 
    local offset=self.w/3
    for i=-(self.w/3),(self.w/3),2 do
-     if fget(mget((self.x+(offset))/8,(self.y+i)/8),0) then
+     if fget(mget((self.x+(offset))/8+moffx,(self.y+i)/8+moffy),0) then
          self.dx=0
          self.x=(flr(((self.x+(offset))/8))*8)-(offset)
          return true
      end
-     if fget(mget((self.x-(offset))/8,(self.y+i)/8),0) then
+     if fget(mget((self.x-(offset))/8+moffx,(self.y+i)/8+moffy),0) then
          self.dx=0
          self.x=(flr((self.x-(offset))/8)*8)+8+(offset)
          return true
@@ -198,16 +199,35 @@ function collide_floor(self)
    --check for collision at multiple points along the bottom
    --of the sprite: left, center, and right.
    for i=-(self.w/3),(self.w/3),2 do
-       local tile=mget((self.x+i)/8,(self.y+(self.h/2))/8)
-       if fget(tile,0) or (fget(tile,1) and self.dy>=0) then
+       local tile=mget((self.x+i)/8+moffx,(self.y+(self.h/2))/8+moffy)
+       if fget(tile,0) or (fget(tile,1) and self.dy>=0 and not (btn(3))) then
            self.dy=0
-           self.y=(flr((self.y+(self.h/2))/8)*8)-(self.h/2)
+           if(not fget(tile,3))then  self.y=(flr((self.y+(self.h/2))/8)*8)-(self.h/2) end
            self.grounded=true
            self.airtime=0
            landed=true
        end
    end
    return landed
+end
+
+function collide_ladder(self)
+   --check for collision at multiple points along the bottom
+   --of the sprite: left, center, and right.
+   local can_ascend=false
+   local can_descend=false
+   local closest_ladder=100
+   local ladder_mid = flr(flr(self.x)/8) * 8 + 4
+   local i = 0
+       local below=mget((self.x+i)/8+moffx,(self.y+(self.h/2))/8+moffy)
+       local level=mget((self.x+i)/8+moffx,(self.y+(self.h/2-1))/8+moffy)
+       if fget(level,2) then
+         can_ascend = true
+       end
+       if fget(below,2) then
+         can_descend = true
+       end
+   return can_ascend,can_descend,ladder_mid
 end
 
 function collide_roof(self)
@@ -217,7 +237,7 @@ function collide_roof(self)
    --check for collision at multiple points along the top
    --of the sprite: left, center, and right.
    for i=-(self.w/3),(self.w/3),2 do
-       if fget(mget((self.x+i)/8,(self.y-(self.h/2))/8),0) then
+       if fget(mget((self.x+i)/8+moffx,(self.y-(self.h/2))/8+moffy),0) then
            self.dy=0
            self.y=flr((self.y-(self.h/2))/8)*8+8+(self.h/2)
            self.jump_hold_time=0
@@ -299,7 +319,7 @@ function interface()
     end
   end
   slf.execute = function(me)
-    me._splats[me._current_splat]:execute()
+    if(me._current_splat) me._splats[me._current_splat]:execute()
   end
   return slf
 end

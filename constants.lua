@@ -1,6 +1,5 @@
 get_xy = true
 skip_tutorial = false
-mute = true
 
 --Game State
 gs = {
@@ -46,19 +45,21 @@ gs = {
     }
   },
   travel_console = {sprite=12,text='travel',w=8,h=8,x=80,y=104},
+  armsdealer = {sprit=9,w=8,h=8,x=164,y=40},
+  npc_1 = {sprite=9,w=8,h=8},
+  npc_2 = {sprite=14,w=8,h=8,x=94,y=64},
+  npc_3 = {sprite=9,w=8,h=8},
+  npc_4 = {sprite=47,w=8,h=8,x=222,y=40},
   tutorial_travel_console = {sprite=12,w=8,h=8,x=80,y=50+40},
   tutorial_player = { sprite=2,w=8,h=8,x=80-8-16,y=127-8 },
   a_prompt = {sprite=9,w=8,h=8,x=100,y=100},
   player_ship = {
     mx0=64,my0=0,mx1=24,my1=24,
     wall_color = 5,
+    planet = 'ganymede',
     actors={
       player = {x=20,y=48},
-      customs = {x=-100,y=-100,is_blocking=true},
-      trader = {x=-100,y=-100},
-      fueler = {x=-100,y=-100},
       a_prompt = {x=-100,y=-100},
-      travel_console = {x=-100,y=-100,sprite=13},
     }
   },
   station_io = {
@@ -73,11 +74,10 @@ gs = {
     },
     actors={
       player = {x=80,y=184},
-      customs = {x=61,y=152,is_blocking=true},
-      trader = {x=96,y=120},
-      fueler = {x=96,y=184},
-      a_prompt = {x=-100,y=-100},
-      travel_console = {x=64,y=184,sprite=13},
+      customs = {ref="customs",x=61,y=152,is_blocking=true,at_y=8,w=8,h=8,text="customs"},
+      trader = {ref="trader",x=96,y=120,at_y=8,w=8,h=8,text="trader"},
+      fueler = {ref="fueler",x=96,y=184,at_y=8,w=8,h=8,text="fueler"},
+      travel_console = {ref="travel_console",x=64,y=184,sprite=13,at_y=8,w=8,h=8,text="travel"},
     },
   },
   station_europa = {
@@ -92,11 +92,11 @@ gs = {
     },
     actors={
       player = {x=80,y=32},
-      customs = {x=80,y=96,is_blocking=true},
-      trader = {x=16,y=96},
-      fueler = {x=96,y=32},
-      a_prompt = {x=-100,y=-100},
-      travel_console = {x=64,y=32,sprite=13},
+      customs = {ref="customs",x=80,y=96,is_blocking=true,at_y=8,w=8,h=8,text="customs"},
+      trader = {ref="trader",x=16,y=96,at_y=8,w=8,h=8,text="trader"},
+      fueler = {ref="fueler",x=96,y=32,at_y=8,w=8,h=8,text="fueler"},
+      a_prompt = {ref="a_prompt",x=-100,y=-100,at_y=8,w=8,h=8,text=""},
+      travel_console = {ref="travel_console",x=64,y=32,sprite=13,at_y=8,w=8,h=8,text="travel"},
     },
   },
   station_ganymede = {
@@ -111,11 +111,14 @@ gs = {
     },
     actors={
       player = {x=52,y=104},
-      customs = {x=32,y=64,is_blocking=true},
-      trader = {x=20,y=24},
-      fueler = {x=40,y=104},
-      a_prompt = {x=-100,y=-100},
-      travel_console = {x=80,y=104,sprite=12},
+      customs = {ref="customs",x=32,y=64,is_blocking=true,at_y=8,w=8,h=8,text="customs"},
+      trader = {ref="trader",x=20,y=24,at_y=8,w=8,h=8,text="trader"},
+      fueler = {ref="fueler",x=40,y=104,at_y=8,w=8,h=8,text="fueler"},
+      armsdealer = {ref="armsdealer",x=164,y=44,sprite=11,at_y=8,w=8,h=8,text="gunner"},
+      npc_2 = {ref="npc_2",x=94,y=30,sprite=14,at_y=8,w=8,h=8,text="kashka"},
+      npc_4 = {ref="npc_4",x=222,y=44,sprite=47,at_y=8,w=8,h=8,text="morris"},
+      a_prompt = {ref="a_prompt",x=-100,y=-100,at_y=8,w=8,h=8,text=""},
+      travel_console = {ref="travel_console",x=80,y=104,sprite=12,at_y=8,w=8,h=8,text="travel"},
     },
   },
   station_callisto = {
@@ -130,14 +133,16 @@ gs = {
     },
     actors={
       player = {x=104,y=88},
-      customs = {x=86,y=48,is_blocking=true},
-      trader = {x=144,y=32},
-      fueler = {x=80,y=88},
-      a_prompt = {x=-100,y=-100},
-      travel_console = {x=120,y=88,sprite=12},
+      customs = {ref="customs",x=86,y=48,is_blocking=true,at_y=8,w=8,h=8,text="customs"},
+      trader = {ref="trader",x=144,y=32,at_y=8,w=8,h=8,text="trader"},
+      fueler = {ref="fueler",x=80,y=88,at_y=8,w=8,h=8,text="fueler"},
+      a_prompt = {ref="a_prompt",x=-100,y=-100,at_y=8,w=8,h=8,text=""},
+      travel_console = {ref="travel_console",x=120,y=88,sprite=12,at_y=8,w=8,h=8,text="travel"},
     },
   }
 }
+moffx = 0
+moffy = 0
 ticker = 0
 ticks = 0 --TODO: adv_micro_platformer. Remove
 music_ticker = 10000
