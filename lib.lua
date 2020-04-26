@@ -78,19 +78,7 @@ function buy_from_trader_action(trader_tag,good)
     local amount = btn(1) and 5 or 1
     local total_bulk = amount*trade_good_info[good].bulk
     printh("I can buy "..p_bus.fuel_tank_free..' units of fuel')
-    if good == 'fuel' 
-      and p_bus.balance > gs[trader_tag].business[good].sell_price * amount / 1000
-      and p_bus.fuel_tank_free >= trade_good_info[good].bulk * amount
-      and gs[trader_tag].business[good].stock >= amount then
-      p_bus.fuel_tank_used += total_bulk
-      p_bus.fuel_tank_free -= total_bulk
-      p_bus.balance -= gs[trader_tag].business[good].sell_price * amount / 1000
-      gs[trader_tag].business[good].stock -= amount
-      reevaluate_price(trader_tag,good)
-      gs[gs.cs].trading = trading_interface(trader_tag,'buy_'..good)
-      sfx(34)
-    elseif good ~= 'fuel' 
-      and p_bus.balance > gs[trader_tag].business[good].sell_price * amount / 1000
+    if p_bus.balance > gs[trader_tag].business[good].sell_price * amount / 1000
       and p_bus.cargo_free >= trade_good_info[good].bulk * amount
       and gs[trader_tag].business[good].stock >= amount then
       p_bus[good].stock += amount
@@ -113,16 +101,7 @@ function sell_to_trader_action(trader_tag,good)
     p_bus = gs['player'].business
     local amount = btn(0) and 5 or 1
     local total_bulk = amount*trade_good_info[good].bulk
-    if good == 'fuel' and p_bus.fuel_tank_used >= amount then
-      p_bus.fuel.stock -= amount
-      p_bus.fuel_tank_free += total_bulk
-      p_bus.fuel_tank_used -= total_bulk
-      p_bus.balance += gs[trader_tag].business[good].buy_price * amount / 1000
-      gs[trader_tag].business[good].stock += amount
-      reevaluate_price(trader_tag,good)
-      gs[gs.cs].trading = trading_interface(trader_tag,'sell_'..good)
-      sfx(33)
-    elseif good ~= 'fuel' and p_bus[good].stock >= amount then
+    if p_bus[good].stock >= amount then
       p_bus[good].stock -= amount
       p_bus.cargo_free += total_bulk
       p_bus.cargo_used -= total_bulk

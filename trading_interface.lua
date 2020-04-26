@@ -46,7 +46,7 @@ function trading_interface(trader_tag,active_splat)
       left='sell_'..my_trade_goods[i],up=i>1 and 'buy_'..my_trade_goods[i-1] or nil, down=i<#my_trade_goods and 'buy_'..my_trade_goods[i+1] or nil,
       execute=buy_from_trader_action(trader_tag,good)
     })
-    slf._splats['amt_'..good] = splat('amt_'..good,{x=l_x+70,y=t_y+i*10,w=20,h=9,text=good=='fuel' and ""..gs['player'].business.fuel_tank_used or ""..player_business[good].stock})
+    slf._splats['amt_'..good] = splat('amt_'..good,{x=l_x+70,y=t_y+i*10,w=20,h=9,text=""..player_business[good].stock})
     i+=1
   end
   return slf

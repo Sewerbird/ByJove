@@ -6,7 +6,7 @@ function starport_scene(station_tag)
   -- Starport methods
   slf.draw = function(me)
     uix = o_uix or clamp(gs['player'].x-64,0,s.mx1*8-127)
-    uiy = o_uix or clamp(gs['player'].y-64,0,s.my1*8-127)
+    uiy = o_uiy or clamp(gs['player'].y-64,0,s.my1*8-127)
     camera(uix, uiy)
     for v in all(stars) do
       circ(mod(ticker/10+v.x*255,s.mx1*8),sin(ticker/5000)*10+v.y*s.my1*8,0,5)

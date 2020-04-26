@@ -1,44 +1,33 @@
 function talking_interface(interlocutor, conversation)
   -- A talking dialog to display a conversation object
   local slf = interface()
-  local conversation = {
-    begin = {text="A conversation can have branches based on yes no questions. Do you want to hear more?",y="more",n="done"},
-    more = {text= "Okay, here is more. Want more?",y="more",n="done",on=function(result)
-      if result=='y' then
-        printh("In a loop again")
-      else
-        printh("Exiting loop")
-      end
-    end},
-    done = {text= "Okay, all done."}
-  }
   local text = conversation.begin.text
   local npc_x = gs[interlocutor].x
   local npc_y = gs[interlocutor].y+16
   o_uix = npc_x -64 +8
-  o_uiy = npc_y -64
+  o_uiy = npc_y -64 -8
   slf.currtext = ""
   slf.spoke = false
   slf.convo_node = "begin"
   slf.tgttext = conversation[slf.convo_node].text
   slf._current_splat='feed'
   --Takes up bottom half of screen, and pans Y to end up under the interlocutor
-  slf._splat = splat('text_area', {text=currtext,at_x=2,at_y=2,x=o_uix,y=npc_y,w=127,h=56,c_f=1,c_b=13,t_center=false})
+  slf._splat = splat('text_area', {text=currtext,at_x=2,at_y=2,x=o_uix,y=npc_y,w=127,h=55,c_f=1,c_b=13,t_center=false})
   --Spits out the text piecemeal
   slf.cursor = 2
   slf.currline_width = 0
   slf.ticker_speed = 2 --letters to reveal per tick
   slf._splats = define_splats({
-    yes = {text="Yes",down="no",x=o_uix+103,y=o_uiy+93,w=24,h=8,hidden=true,execute=function(me)
+    yes = {text="Yes",down="no",x=o_uix+103,y=o_uiy+109,w=24,h=8,hidden=true,execute=function(me)
       slf:next("y")
     end},
-    no = {text="No",up="yes",x=o_uix+103,y=o_uiy+101,w=24,h=8,hidden=true,execute=function(me)
+    no = {text="No",up="yes",x=o_uix+103,y=o_uiy+117,w=24,h=8,hidden=true,execute=function(me)
       slf:next("n")
     end},
-    ok = {text="ok",x=o_uix+103,y=o_uiy+101,w=24,h=8,hidden=true,execute=function(me)
+    ok = {text="ok",x=o_uix+103,y=o_uiy+117,w=24,h=8,hidden=true,execute=function(me)
       slf:next("k")
     end},
-    feed = {text="...",x=o_uix+103,y=o_uiy+101,w=24,h=8,c_f=0,c_b=0,c_fa=0,c_ba=0,active=true}
+    feed = {text="...",x=o_uix+103,y=o_uiy+117,w=24,h=8,c_f=0,c_b=0,c_fa=0,c_ba=0}
   })
   slf.next = function(me,next)
     if conversation[me.convo_node].on then
@@ -63,7 +52,7 @@ function talking_interface(interlocutor, conversation)
   slf.update = function(me)
     for i=1,slf.ticker_speed do
       if me.cursor < #me.tgttext then
-        sfx(34)
+        sfx(35,3,flr(rnd()*10),1)
         me._current_splat = "feed"
         me.cursor += 1
         me.currline_width += 1

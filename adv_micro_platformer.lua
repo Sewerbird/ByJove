@@ -196,12 +196,7 @@
            local a=slf.anims[slf.curanim]
            local frame=a.frames[slf.curframe]
            palt(0,true)
-           spr(frame,
-               slf.x-(slf.w/2),
-               slf.y-(slf.h/2),
-               slf.w/8,slf.h/8,
-               slf.flipx,
-               false)
+           spr(frame, slf.x-(slf.w/2), slf.y-(slf.h/2), slf.w/8,slf.h/8, slf.flipx, false)
            pal()
          end,
      }

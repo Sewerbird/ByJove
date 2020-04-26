@@ -23,7 +23,6 @@ function wandering_interface(station_tag)
     --Handle pressing 'A' to activate an NPC
     if target_npc and btnp(5) then
       sfx(-1,1) 
-      sfx(35)
       if target_npc == "trader" or target_npc == "fueler" then
         sfx(38)
         gs[gs.cs]:push_interface('trading',trading_interface(target_npc))
@@ -32,7 +31,7 @@ function wandering_interface(station_tag)
         gs[gs.cs]:push_interface('travelling',travelling_interface(slf._current_splat))
       else
         sfx(38)
-        gs[gs.cs]:push_interface('talking',talking_interface(target_npc,{"Hello! Are you doing well?"}))
+        gs[gs.cs]:push_interface('talking',talking_interface(target_npc,conversations.default))
       end
     end
   end

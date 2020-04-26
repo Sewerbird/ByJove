@@ -161,6 +161,19 @@ planets = {
   ganymede= {sprite_id=108,s_w=2,s_h=2,x=64-8-40,y=64+10},
   callisto= {sprite_id=76,s_w=2,x=64-8-35,y=64+40,s_h=2},
 }
+conversations = {
+  default = {
+    begin = {text="A conversation can have branches based on yes no questions. Do you want to hear more?",y="more",n="done"},
+    more = {text= "Okay, here is more. Want more?",y="more",n="done",on=function(result)
+      if result=='y' then
+        printh("In a loop again")
+      else
+        printh("Exiting loop")
+      end
+    end},
+    done = {text= "Okay, all done."}
+  }
+}
 --Creates 500 x,y pairs to be reused for star effects, with a random color
 stars = {}
 for i=1,500 do
