@@ -1,5 +1,5 @@
-get_xy = true
-skip_tutorial = false
+get_xy = false
+skip_tutorial = true
 
 --Game State
 gs = {
@@ -7,7 +7,7 @@ gs = {
   cs = "start_scene",
   current_station = "station_ganymede",
   player = create_player({
-    sprite=2,w=8,h=8,x=52,y=104,
+    sprite=2,w=8,h=8,x=52,y=64,
     business = {
       tax_rate = 0,
       balance = 1,
@@ -24,7 +24,6 @@ gs = {
       electronics = {stock = 0},
     }
   }),
-  customs = {sprite=7,text='customs',w=8,h=8,x=32,y=64,is_blocking=true},
   trader = {
     sprite=8,text='trader',w=8,h=8,x=20,y=24,
     business = {
@@ -74,7 +73,6 @@ gs = {
     },
     actors={
       player = {x=80,y=184},
-      customs = {ref="customs",x=61,y=152,is_blocking=true,at_y=8,w=8,h=8,text="customs"},
       trader = {ref="trader",x=96,y=120,at_y=8,w=8,h=8,text="trader"},
       fueler = {ref="fueler",x=96,y=184,at_y=8,w=8,h=8,text="fueler"},
       travel_console = {ref="travel_console",x=64,y=184,sprite=13,at_y=8,w=8,h=8,text="travel"},
@@ -92,7 +90,6 @@ gs = {
     },
     actors={
       player = {x=80,y=32},
-      customs = {ref="customs",x=80,y=96,is_blocking=true,at_y=8,w=8,h=8,text="customs"},
       trader = {ref="trader",x=16,y=96,at_y=8,w=8,h=8,text="trader"},
       fueler = {ref="fueler",x=96,y=32,at_y=8,w=8,h=8,text="fueler"},
       a_prompt = {ref="a_prompt",x=-100,y=-100,at_y=8,w=8,h=8,text=""},
@@ -110,8 +107,7 @@ gs = {
       station_callisto = 30,
     },
     actors={
-      player = {x=52,y=104},
-      customs = {ref="customs",x=32,y=64,is_blocking=true,at_y=8,w=8,h=8,text="customs"},
+      player = {x=52,y=64},
       trader = {ref="trader",x=20,y=24,at_y=8,w=8,h=8,text="trader"},
       fueler = {ref="fueler",x=40,y=104,at_y=8,w=8,h=8,text="fueler"},
       armsdealer = {ref="armsdealer",x=164,y=44,sprite=11,at_y=8,w=8,h=8,text="gunner"},
@@ -133,7 +129,6 @@ gs = {
     },
     actors={
       player = {x=104,y=88},
-      customs = {ref="customs",x=86,y=48,is_blocking=true,at_y=8,w=8,h=8,text="customs"},
       trader = {ref="trader",x=144,y=32,at_y=8,w=8,h=8,text="trader"},
       fueler = {ref="fueler",x=80,y=88,at_y=8,w=8,h=8,text="fueler"},
       a_prompt = {ref="a_prompt",x=-100,y=-100,at_y=8,w=8,h=8,text=""},
@@ -141,13 +136,16 @@ gs = {
     },
   }
 }
+uix = nil
+uiy = nil
+o_uix = nil
+o_uiy = nil
 moffx = 0
 moffy = 0
 ticker = 0
 ticks = 0 --TODO: adv_micro_platformer. Remove
 music_ticker = 10000
 win_amount = 10 --k$
-customs_amount = 0.1 --k$
 lose_amount = 0
 trade_goods = {'medicine','parcels','machinery','electronics','fuel'}
 trade_good_info = {
