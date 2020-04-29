@@ -7,7 +7,7 @@ function travel_dialog(here,destination)
   local c_x = 64
   local fuel_need = gs[here].fuel_cost[destination]
   local trip_time = fuel_need/6
-  local has_the_fuel =gs.player.business.fuel.stock >= fuel_need 
+  local has_the_fuel =gs.player.business.fuel_tank_used >= fuel_need 
   slf._current_splat= has_the_fuel and 'ok_button' or 'cancel_button'
   local text = "Travelling to\n"..gs[destination].planet.."\nFuel needed:"..fuel_need.."\nDays: "..flr(trip_time).." days"
   slf._splat = splat('background',{ x=l_x,y=t_y,w=w,h=h,c_b=13,c_f=1,text = text,t_center=false, at_x=2, at_y=2})
@@ -19,8 +19,8 @@ function travel_dialog(here,destination)
         sfx(38)
         gs[gs.cs]:pop_interface(2) --pop dialog and map interface
         --TODO go to ship scene instead
-        printh("Removing fuel")
-        gs.player.business.fuel.stock -= fuel_need
+        gs.player.business.fuel_tank_used -= fuel_need
+        gs.player.business.fuel_tank_free += fuel_need
         load_station(destination)
         --load_station('player_ship')
       end

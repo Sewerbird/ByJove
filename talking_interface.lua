@@ -9,12 +9,33 @@ function talking_interface(interlocutor, conversation)
   slf.currtext = ""
   slf.spoke = false
   slf.convo_node = "begin"
+  printh(slf.convo_node..":-> ")
   slf.tgttext = conversation[slf.convo_node].text
+  --Process parameters
+  local i = 0
+  local builtup = ""
+  local skip = false
+  for i = 1, #slf.tgttext do
+    local nc = sub(slf.tgttext,i,i)
+    if nc == '%' then
+      local code = sub(slf.tgttext,i+1,i+1)
+      builtup = builtup..conversation[code]
+      skip = true
+    elseif skip then
+      skip = false
+    else
+      builtup = builtup..nc
+    end
+  end
+  slf.tgttext = builtup
+  printh("Gonna show " .. slf.tgttext)
+  --Finish up
   slf._current_splat='feed'
   --Takes up bottom half of screen, and pans Y to end up under the interlocutor
-  slf._splat = splat('text_area', {text=currtext,at_x=2,at_y=2,x=o_uix,y=npc_y,w=127,h=55,c_f=1,c_b=13,t_center=false})
+  slf._splat = splat('text_area', {at_x=2,at_y=2,x=o_uix,y=npc_y,w=127,h=55,c_f=1,c_b=13,t_center=false})
   --Spits out the text piecemeal
-  slf.cursor = 2
+  slf.param = 1 --which string parameter we're on
+  slf.cursor = 1
   slf.currline_width = 0
   slf.ticker_speed = 2 --letters to reveal per tick
   slf._splats = define_splats({
@@ -51,10 +72,9 @@ function talking_interface(interlocutor, conversation)
   end
   slf.update = function(me)
     for i=1,slf.ticker_speed do
-      if me.cursor < #me.tgttext then
+      if me.cursor <= #me.tgttext then
         sfx(35,3,flr(rnd()*10),1)
         me._current_splat = "feed"
-        me.cursor += 1
         me.currline_width += 1
         if me.currline_width / 31 > 1 then
           me.currtext = me.currtext.."\n"
@@ -62,8 +82,10 @@ function talking_interface(interlocutor, conversation)
         end
         local nc = sub(me.tgttext,me.cursor,me.cursor)
         --reveal more
+        printh("Curr text is now '"..me.currtext.."'")
         me.currtext = me.currtext..nc
         me._splat.text = me.currtext
+        me.cursor += 1
       elseif not me.spoke then
         --transition to spoke state
         me._splats.feed.hidden = true

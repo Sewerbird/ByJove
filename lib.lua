@@ -17,6 +17,33 @@ function fmget(x,y,f)
   return fget(mget(x,y),f)
 end
 
+function rndi(n)
+  return flr(rnd() * n)
+end
+
+function sample(obj)
+  local keys = {}
+  for k,v in pairs(obj) do
+    add(keys,k)
+  end
+  return obj[keys[rndi(#keys)+1]]
+end
+
+function deepcopy(orig)
+    local orig_type = type(orig)
+    local copy
+    if orig_type == 'table' then
+        copy = {}
+        for orig_key, orig_value in next, orig, nil do
+            copy[deepcopy(orig_key)] = deepcopy(orig_value)
+        end
+        setmetatable(copy, deepcopy(getmetatable(orig)))
+    else -- number, string, boolean, etc
+        copy = orig
+    end
+    return copy
+end
+
 -- Gamestate Support
 
 function reevaluate_price(trader, trade_good)
@@ -66,15 +93,30 @@ function load_station(destination)
       if gs[key].business ~= nil and gs[key].business.volatile and key ~= 'player' then
         run_trader_update(key)
       end
+      if gs[key].insider then
+        gs[key].insider_event = generate_event(gs.current_station)
+        gs[key].convo = gs[key].insider_event.rumor
+      end
     end
   end
   --Load the station
   gs.starport = starport_scene(destination)
 end
 
+function generate_event(here)
+  local planet = here
+  while planet == here do
+    planet = planet_keys[rndi(#planet_keys)+1]
+  end
+  local event = deepcopy(sample(event_templates))
+  event.rumor.p = planet
+  event.rumor.g = trade_goods[rndi(#trade_goods)+1]
+  return event
+end
+
 function buy_from_trader_action(trader_tag,good)
   return function(me)
-    p_bus = gs['player'].business
+    p_bus = gs.player.business
     local amount = btn(1) and 5 or 1
     local total_bulk = amount*trade_good_info[good].bulk
     printh("I can buy "..p_bus.fuel_tank_free..' units of fuel')
@@ -98,7 +140,7 @@ end
 
 function sell_to_trader_action(trader_tag,good)
   return function(me)
-    p_bus = gs['player'].business
+    p_bus = gs.player.business
     local amount = btn(0) and 5 or 1
     local total_bulk = amount*trade_good_info[good].bulk
     if p_bus[good].stock >= amount then

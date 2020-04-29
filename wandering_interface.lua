@@ -13,7 +13,7 @@ function wandering_interface(station_tag)
     local target_npc = nil
     for k,v in pairs(gs[station_tag].actors) do
       if k != 'player' and k != 'a_prompt' then
-        if dsto(v, gs['player']) < 12 then
+        if dsto(v, gs.player) < 12 then
           target_npc = k
         end
       end
@@ -29,9 +29,9 @@ function wandering_interface(station_tag)
       elseif target_npc == "travel_console" then
         sfx(38)
         gs[gs.cs]:push_interface('travelling',travelling_interface(slf._current_splat))
-      else
+      elseif gs[target_npc].convo then
         sfx(38)
-        gs[gs.cs]:push_interface('talking',talking_interface(target_npc,conversations.default))
+        gs[gs.cs]:push_interface('talking',talking_interface(target_npc,gs[target_npc].convo))
       end
     end
   end

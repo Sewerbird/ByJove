@@ -5,8 +5,8 @@ function starport_scene(station_tag)
   slf.current_station = station_tag
   -- Starport methods
   slf.draw = function(me)
-    uix = o_uix or clamp(gs['player'].x-64,0,s.mx1*8-127)
-    uiy = o_uiy or clamp(gs['player'].y-64,0,s.my1*8-127)
+    uix = o_uix or clamp(gs.player.x-64,0,s.mx1*8-127)
+    uiy = o_uiy or clamp(gs.player.y-64,0,s.my1*8-127)
     camera(uix, uiy)
     for v in all(stars) do
       circ(mod(ticker/10+v.x*255,s.mx1*8),sin(ticker/5000)*10+v.y*s.my1*8,0,5)
@@ -15,7 +15,7 @@ function starport_scene(station_tag)
     palt(14,true)
     pal(5,s.wall_color)
     map(s.mx0,s.my0,0,0,s.mx1,s.my1)
-    gs['player']:draw()
+    gs.player:draw()
     pal()
   end
   slf.update = function(me)

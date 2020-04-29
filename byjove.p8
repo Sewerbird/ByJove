@@ -15,24 +15,7 @@ __lua__
 #include tutorial.lua
 #include endgame.lua
 
-function _init()
-  printh("Starting game")
-  gs.starport_scene = starport_scene('station_ganymede')
-  gs.start_scene = start_scene()
-  gs.cs = skip_tutorial and 'starport_scene' or 'start_scene'
-  gs.player:set_anim("walk")
-end
-
-function _update()
-  if get_xy then printh(gs['player'].x..","..gs['player'].y) end
-  check_end_conditions()
-  gs[gs.cs]:_update()
-end
-
-function _draw()
-  cls()
-  gs[gs.cs]:_draw()
-end
+#include main.lua
 __gfx__
 7d0000d70000000000044000000150000000000006555560000000000007700000300300007777700008800000077000000000000000000000444000000ff000
 d000000d00000000004ff400000150000000000006000060000000000061160000333300077b7b7700088800007877000000070000700000004f4400000ff000

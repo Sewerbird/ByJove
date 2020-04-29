@@ -7,7 +7,7 @@ function trading_interface(trader_tag,active_splat)
   local l_x = c_x-w/2
   local t_y = 64-h/2+uiy
   local trader_business = gs[trader_tag].business
-  local player_business = gs['player'].business
+  local player_business = gs.player.business
   local my_trade_goods = {}
   for good in all(trade_goods) do
     if gs[trader_tag].business[good] ~= nil then
